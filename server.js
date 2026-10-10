@@ -4,6 +4,7 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 
 const ROOT = __dirname;
+const DEEPSEEK_CHAT_URL = 'https://api.deepseek.com/chat/completions';
 const FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
@@ -26,7 +27,7 @@ function cleanHistory(history) {
     .map(item => ({ role: item.role === 'agent' ? 'assistant' : 'user', content: item.text.slice(0, 1200) }));
 }
 
-function buildResponsePayload({ message, history, context }, model = 'gpt-6.1-sol') {
+function buildResponsePayload({ message, history, context }, model = 'deepseek-flash') {
   const itinerary = Array.isArray(context?.activities) ? context.activities.slice(0, 12).map(item => ({
     activity: String(item.label || '').slice(0, 40),
     start: String(item.start || '').slice(0, 8),
@@ -37,22 +38,22 @@ function buildResponsePayload({ message, history, context }, model = 'gpt-6.1-so
   const flight = { number: 'CX251', destination: '倫敦希斯路', boarding: '19:20', gate: String(context?.gate || '25').slice(0, 8), loungeWindow: '17:30–19:15' };
   return {
     model,
-    reasoning: { effort: 'low' },
-    instructions: INSTRUCTIONS,
-    input: [
+    messages: [
+      { role: 'system', content: INSTRUCTIONS },
       { role: 'user', content: '目前行程資料：' + JSON.stringify({ flight, itinerary }) },
       ...cleanHistory(history),
       { role: 'user', content: message }
     ],
-    max_output_tokens: 1200,
-    store: false
+    thinking: { type: 'enabled' },
+    reasoning_effort: 'low',
+    stream: false,
+    max_tokens: 4096
   };
 }
 
 function extractOutputText(response) {
-  return (response?.output || []).filter(item => item.type === 'message')
-    .flatMap(item => item.content || []).filter(part => part.type === 'output_text')
-    .map(part => part.text || '').join('\n').trim();
+  return typeof response?.choices?.[0]?.message?.content === 'string'
+    ? response.choices[0].message.content.trim() : '';
 }
 
 async function readJson(request) {
@@ -78,11 +79,11 @@ function sendJson(response, status, payload) {
   response.end(JSON.stringify(payload));
 }
 
-function createAppServer({ apiKey = process.env.OPENAI_API_KEY, model = process.env.OPENAI_MODEL || 'gpt-6.1-sol', fetchImpl = fetch } = {}) {
+function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = process.env.DEEPSEEK_MODEL || 'deepseek-flash', fetchImpl = fetch } = {}) {
   return http.createServer(async (request, response) => {
     const url = new URL(request.url, 'http://localhost');
     if (url.pathname === '/api/status' && request.method === 'GET') {
-      sendJson(response, 200, { mode: apiKey ? 'live' : 'demo', model: apiKey ? model : null });
+      sendJson(response, 200, { mode: apiKey ? 'live' : 'demo', provider: 'deepseek', model: apiKey ? model : null });
       return;
     }
     if (url.pathname === '/api/chat' && request.method === 'POST') {
@@ -92,15 +93,18 @@ function createAppServer({ apiKey = process.env.OPENAI_API_KEY, model = process.
         const message = typeof body.message === 'string' ? body.message.trim() : '';
         if (!message || message.length > 2000) { sendJson(response, 400, { error: 'INVALID_MESSAGE' }); return; }
         const payload = buildResponsePayload({ message, history: body.history, context: body.context }, model);
-        const upstream = await fetchImpl('https://api.openai.com/v1/responses', {
+        const upstream = await fetchImpl(DEEPSEEK_CHAT_URL, {
           method: 'POST',
           headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(30000)
+          signal: AbortSignal.timeout(60000)
         });
         if (!upstream.ok) {
-          console.error('OpenAI response failed:', upstream.status, upstream.headers.get('x-request-id') || '');
-          sendJson(response, 502, { error: 'AI_UNAVAILABLE' });
+          console.error('DeepSeek response failed:', upstream.status);
+          const error = upstream.status === 401 ? 'AI_AUTH_FAILED'
+            : upstream.status === 402 ? 'AI_BALANCE_LOW'
+            : upstream.status === 429 ? 'AI_RATE_LIMITED' : 'AI_UNAVAILABLE';
+          sendJson(response, 502, { error });
           return;
         }
         const answer = extractOutputText(await upstream.json());
@@ -132,7 +136,7 @@ if (require.main === module) {
   createAppServer().listen(port, '127.0.0.1', () => {
     const pageUrl = 'http://127.0.0.1:' + port + '/';
     console.log('貴賓室原型已啟動：' + pageUrl);
-    console.log(process.env.OPENAI_API_KEY ? '模式：即時 AI' : '模式：演示（未設定 OPENAI_API_KEY）');
+    console.log(process.env.DEEPSEEK_API_KEY ? '模式：DeepSeek AI' : '模式：演示（未設定 DEEPSEEK_API_KEY）');
     console.log('請保持此終端視窗開啟；關閉視窗後，本機頁面就無法使用。');
     if (process.env.OPEN_BROWSER === '1' && process.platform === 'darwin') {
       const browser = spawn('open', [pageUrl], { stdio: 'ignore' });

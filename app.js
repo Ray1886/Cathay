@@ -218,7 +218,7 @@ async function checkAgentMode(){
     const status=await response.json();
     if(status.mode!=='live')return;
     aiMode='live';
-    $('#agentModeLabel').textContent='即時 AI 已連接';
+    $('#agentModeLabel').textContent='DeepSeek AI 已啟用';
     $('.agent-presence').classList.add('live');
     if(!chatTouched){
       messages=[{role:'agent',text:'您好，我已讀取目前的示範行程。您可以直接提出偏好或突發情況，我會根據時間安排提供建議。',time:'17:24'}];
@@ -249,14 +249,22 @@ async function sendMessage(){
   messages.push(pending); renderChat();
   try{
     const response=await fetch('./api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history,context:currentContext()})});
-    if(!response.ok)throw new Error('AI_UNAVAILABLE');
+    if(!response.ok){
+      const failure=await response.json().catch(()=>({}));
+      throw new Error(failure.error||'AI_UNAVAILABLE');
+    }
     const result=await response.json();
     if(typeof result.reply!=='string'||!result.reply.trim())throw new Error('EMPTY_AI_RESPONSE');
     messages=messages.filter(m=>m!==pending);
     addMessage('agent',result.reply.trim());
-  }catch(_){
+  }catch(error){
     messages=messages.filter(m=>m!==pending);
-    addMessage('agent','即時 AI 暫時無法連線。您的行程仍保留，請稍後再試，或使用下方功能按鈕調整。');
+    const detail={
+      AI_AUTH_FAILED:'DeepSeek API key 無效，請檢查並重新啟動本機服務。',
+      AI_BALANCE_LOW:'DeepSeek 帳戶餘額不足，請檢查帳戶餘額。',
+      AI_RATE_LIMITED:'DeepSeek 請求過於頻繁，請稍後再試。'
+    }[error.message]||'DeepSeek 暫時無法連線，請稍後再試。';
+    addMessage('agent',detail+'您的行程仍保留。');
   }finally{
     sending=false; $('#sendButton').disabled=false; input.disabled=false; input.focus();
   }

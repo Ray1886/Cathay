@@ -4,13 +4,13 @@
 
 ## 啟用即時 AI
 
-直接開啟 index.html 時，助手會明確標示「演示模式」，使用本機規則回覆。要使用 OpenAI 模型：
+直接開啟 index.html 時，助手會明確標示「演示模式」，使用本機規則回覆。要使用 DeepSeek API：
 
-1. 在 OpenAI Platform 建立 API key。不要把 key 貼到聊天、寫入前端程式或提交到 Git。
+1. 在 DeepSeek Platform 建立 API key。不要把 key 貼到聊天、寫入前端程式或提交到 Git。
 2. 在此資料夾的終端機執行 `./start-local.command`，依提示輸入 key；輸入時會顯示，腳本不會把 key 存成檔案。
-3. 開啟 http://127.0.0.1:8765。畫面顯示「即時 AI 已連接」後，新訊息會透過本機 server.js 呼叫 Responses API。
+3. 腳本會自動開啟 http://127.0.0.1:8765。畫面顯示「DeepSeek AI 已啟用」後，新訊息會透過本機 server.js 呼叫 DeepSeek Chat Completions API。請保持終端視窗開啟。
 
-預設模型為 gpt-6.1-sol，可用 OPENAI_MODEL 環境變數調整。由於 file:// 與 http://127.0.0.1 使用不同的瀏覽器儲存空間，切換網址後可能需要重新保存行程。
+預設模型為 deepseek-flash，可用 DEEPSEEK_MODEL 環境變數調整。由於 file:// 與 http://127.0.0.1 使用不同的瀏覽器儲存空間，切換網址後可能需要重新保存行程。若原本的本機服務仍在運行，請先關閉再重啟，讓新設定生效。
 
 ## 可操作功能
 
