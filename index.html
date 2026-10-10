@@ -1,85 +1,65 @@
 <!doctype html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f6f8f7" />
-    <title>AI 貴賓行程助理｜客戶端原型</title>
-    <link rel="stylesheet" href="./styles.css" />
-    <link rel="stylesheet" href="./enhancements.css" />
-  </head>
-  <body>
-    <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2Zm7 13 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></symbol>
-      <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></symbol>
-      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
-      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></symbol>
-      <symbol id="i-plane" viewBox="0 0 24 24"><path d="m21 3-7 18-3.5-7.5L3 10l18-7ZM10.5 13.5 21 3"/></symbol>
-      <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 16.5-.5 4 4-.5L19 8.5 15.5 5 4 16.5ZM13.5 7l3.5 3.5"/></symbol>
-      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v6m4-6v6"/></symbol>
-      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
-      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
-      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 1 6M20 3v5h-5"/></symbol>
-      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
-      <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
-      <symbol id="i-menu" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
-      <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4.5 3-7 8-7s8 2.5 8 7"/></symbol>
-      <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 13v-2a9 9 0 0 1 18 0v2M3 13v5a2 2 0 0 0 2 2h2v-8H5a2 2 0 0 0-2 2Zm18 0v5a2 2 0 0 1-2 2h-2v-8h2a2 2 0 0 1 2 2Z"/></symbol>
-    </svg>
-
-    <div class="desktop-backdrop" aria-hidden="true"></div>
-    <main class="app-shell">
-      <div class="demo-ribbon">互動原型 · 示範航班與服務資料</div>
-      <div class="app">
-        <header class="hero">
-          <div class="hero-top"><span class="wordmark">CATHAY <span>CONCIERGE</span></span><span class="hero-date">旅程示範</span></div>
-          <div class="hero-copy">
-            <p class="eyebrow">為旅程留出從容</p>
-            <h1>智能貴賓室<br />行程規劃</h1>
-            <p>告訴我們你的想法，讓候機時間恰到好處。</p>
-          </div>
-          <div class="flight-pill"><svg><use href="#i-plane"/></svg><strong>CX418</strong><span>19:40 起飛</span><span class="pill-divider"></span><span>G25 登機口</span></div>
-        </header>
-
-        <section class="content">
-          <div class="input-panel surface">
-            <div class="section-heading"><div><span class="section-kicker">YOUR PLAN</span><h2>你想如何度過這段時間？</h2></div><span class="step-mark">01</span></div>
-            <div class="input-wrap"><textarea id="requestInput" aria-label="輸入你的行程需求" placeholder="例如：我想先洗澡、吃飯，再安排按摩……" rows="3"></textarea><button id="micButton" class="mic-button" type="button" aria-label="開始語音輸入" title="開始語音輸入"><svg><use href="#i-mic"/></svg></button></div>
-            <div class="input-bottom"><span class="input-hint">說出你的安排，或點選下方活動</span><label class="speech-language">語音語言 <select id="speechLang" aria-label="語音識別語言"><option value="zh-CN">普通話</option><option value="zh-HK">廣東話</option><option value="zh-TW">國語（繁體）</option></select></label></div>
-            <p id="voiceStatus" class="voice-feedback" role="status" aria-live="polite"></p>
-            <div id="chips" class="chips" aria-label="快速加入活動"></div>
-            <button id="generateButton" class="generate-button" type="button"><svg><use href="#i-spark"/></svg><span>AI 自動安排</span><svg class="generate-arrow"><use href="#i-chevron"/></svg></button>
-          </div>
-
-          <div class="insight-panel surface">
-            <div class="insight-header"><div class="insight-orb"><svg><use href="#i-spark"/></svg></div><div><span class="section-kicker">FLIGHT INSIGHTS</span><h2>已整合航班與廊橋資訊</h2></div><span class="demo-badge">示範</span></div>
-            <div class="insight-grid">
-              <div><span>可用時間</span><strong>17:30–19:15</strong></div>
-              <div><span>登機口</span><strong>G25</strong></div>
-              <div><span>步行時間</span><strong>約 10 分鐘</strong></div>
-              <div><span>預留緩衝</span><strong>25 分鐘</strong></div>
-            </div>
-            <p class="insight-note"><svg><use href="#i-clock"/></svg> 已按 19:40 起飛時間，預留步行與登機緩衝。</p>
-          </div>
-
-          <section class="itinerary surface" aria-labelledby="itineraryTitle">
-            <div class="section-heading itinerary-heading"><div><span class="section-kicker">YOUR ITINERARY</span><h2 id="itineraryTitle">為你安排的行程</h2></div><button id="replanButton" class="text-button" type="button"><svg><use href="#i-refresh"/></svg>重新編排</button></div>
-            <div id="planSummary" class="plan-summary" aria-live="polite"></div>
-            <div id="planWarnings" class="plan-warnings" role="status" aria-live="polite" hidden></div>
-            <div id="activityList" class="activity-list"></div>
-            <div class="itinerary-actions"><button id="addButton" class="outline-button" type="button"><svg><use href="#i-plus"/></svg>新增活動</button><button id="deleteButton" class="outline-button" type="button"><svg><use href="#i-trash"/></svg>刪除活動</button></div>
-          </section>
-
-          <div class="booking-panel"><div><span class="booking-eyebrow">READY WHEN YOU ARE</span><strong id="bookingCount">1 項服務待確認</strong><span class="booking-caption">確認後將在此原型中更新預約狀態</span></div><button id="bookingButton" type="button">確認預約 <svg><use href="#i-chevron"/></svg></button></div>
-          <p class="prototype-note">介面原型使用示範資料；真實航班、服務可用時段與預約需接入正式系統。</p>
-        </section>
-
-        <nav class="bottom-nav" aria-label="主要導覽"><button class="active" type="button" data-nav="行程"><svg><use href="#i-menu"/></svg><span>行程</span></button><button type="button" data-nav="貴賓室"><svg><use href="#i-headphones"/></svg><span>貴賓室</span></button><button type="button" data-nav="航班"><svg><use href="#i-plane"/></svg><span>航班</span></button><button type="button" data-nav="我的"><svg><use href="#i-person"/></svg><span>我的</span></button></nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5faf9">
+  <title>貴賓室智能行程</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<svg class="icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 4-8 8 8 8"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 1 2.4 8.6L23 12l-8.6 2.4L12 23l-2.4-8.6L1 12l8.6-2.4L12 1Z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 2 2 5-5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="m3 6 2 2 3-3M11 7h10M3 14l2 2 3-3m3 2h10M3 21l2 2 3-3m3 2h10"/></symbol>
+  <symbol id="i-shower" viewBox="0 0 24 24"><path d="M5 12V8a6 6 0 0 1 12 0v1M12 9h8v4h-8zM13 17v2m4-2v3m4-3v2M3 17v2m4-2v3"/></symbol>
+  <symbol id="i-dining" viewBox="0 0 24 24"><path d="M4 2v9m3-9v9m3-9v9M4 11h6m-3 0v11M17 2c-3 3-3 9 0 11h3V2h-3Zm1 11v9"/></symbol>
+  <symbol id="i-spa" viewBox="0 0 24 24"><path d="M12 20c-5-3-7-7-7-11 4 0 6 2 7 5 1-3 3-5 7-5 0 4-2 8-7 11ZM12 14C9 11 9 7 12 3c3 4 3 8 0 11ZM5 13c-2-1-3-1-4-1 1 5 5 8 11 8m7-7c2-1 3-1 4-1-1 5-5 8-11 8"/></symbol>
+  <symbol id="i-rest" viewBox="0 0 24 24"><path d="M3 12h18v7H3zM5 12V9a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v3M3 19v2m18-2v2M8 9h3m2 0h3"/></symbol>
+  <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="14" cy="3.5" r="1.7"/><path d="m10 9 4-2 3 3 3 1M14 7l-2 6-4 3m4-3 4 3 1 5M8 16l-3 5"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="m21 3-7 18-3.5-7.5L3 10l18-7ZM10.5 13.5 21 3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 16-.5 4 4-.5L19 8l-3-3L4 16ZM14 7l3 3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v6m4-6v6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 1 6M20 3v5h-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3Zm0 7v4m0 3h.01"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m21 3-7 18-3.5-7.5L3 10l18-7ZM10.5 13.5 21 3"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10Zm-8 13h4"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
+  <symbol id="i-arrows" viewBox="0 0 24 24"><path d="m7 3-4 4 4 4M3 7h14m0 14 4-4-4-4m4 4H7"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9h.01"/></symbol>
+</svg>
+<div class="ambient" aria-hidden="true"></div>
+<main class="phone" aria-label="貴賓室智能行程互動原型">
+  <div class="statusbar" aria-hidden="true"><strong>9:41</strong><span class="system-icons">▂▄▆　◕　▰</span></div>
+  <section id="plannerScreen" class="screen active" aria-label="我的貴賓室行程">
+    <header class="planner-hero">
+      <div class="hero-image"></div>
+      <div class="hero-content">
+        <div class="flight-title"><button class="back-button" type="button" aria-label="返回" data-action="back"><svg><use href="#i-back"/></svg></button><div><span class="flight-code">CX251 <span>→</span> 倫敦希斯路</span><p>登機時間 <b>19:20</b><i></i> 登機口 <b id="plannerGate">25</b></p></div><button id="openAgent" class="agent-launch" type="button"><svg><use href="#i-spark"/></svg><span>開啟智能助手</span></button></div>
+        <div class="hero-lower"><span><svg><use href="#i-clock"/></svg> 可用休息時間 <strong>1小時45分</strong></span><small>17:30 — 19:15</small></div>
       </div>
-    </main>
-
-    <dialog id="activityDialog" class="activity-dialog"><form id="activityForm" method="dialog"><div class="dialog-top"><div><span class="section-kicker">EDIT YOUR PLAN</span><h2 id="dialogTitle">新增活動</h2></div><button id="closeDialog" class="icon-button" type="button" aria-label="關閉"><svg><use href="#i-close"/></svg></button></div><label>活動<select id="activityType" required><option value="shower">淋浴</option><option value="dining">用餐</option><option value="massage">按摩</option><option value="rest">休息</option><option value="work">工作</option><option value="gate">前往登機口</option></select></label><div class="time-fields"><label>開始時間<input id="activityStart" type="time" required /></label><label>結束時間<input id="activityEnd" type="time" required /></label></div><label>地點<input id="activityVenue" type="text" required /></label><p id="dialogError" class="dialog-error" role="alert"></p><button class="save-button" type="submit">儲存活動</button></form></dialog>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="./app.js"></script>
-  </body>
+    </header>
+    <div class="planner-content">
+      <section class="overview card" aria-label="行程概覽"><div class="overview-item"><span class="round-icon pale"><svg><use href="#i-clock"/></svg></span><div><small>目前可用休息時間</small><strong>1小時45分</strong><span>17:30 – 19:15</span></div></div><div class="overview-divider"></div><div class="overview-item"><span class="round-icon pale"><svg><use href="#i-list"/></svg></span><div><small>已安排</small><strong><span id="activityCount">3</span> 項活動</strong><span id="remainingText">還可探索更多服務</span></div></div></section>
+      <section class="schedule card" aria-labelledby="scheduleTitle"><div class="section-head"><div class="section-title"><span class="round-icon dark"><svg><use href="#i-calendar"/></svg></span><div><small>為每段候機時光做好安排</small><h1 id="scheduleTitle">我的貴賓室行程</h1></div></div><button id="reorderButton" class="tiny-button" type="button"><svg><use href="#i-arrows"/></svg> 重新排序</button></div><div id="planWarnings" class="warning" hidden></div><div id="activityList" class="timeline"></div><div class="boarding-strip"><div><svg><use href="#i-plane"/></svg><strong>登機 19:20</strong><span>登機口 <b id="stripGate">25</b></span></div><small><svg><use href="#i-info"/></svg> 預留 10 分鐘緩衝時間</small></div></section>
+      <section class="discover card" aria-labelledby="discoverTitle"><div class="section-head"><div class="section-title"><span class="round-icon dark"><svg><use href="#i-spa"/></svg></span><div><small>尋找下一個從容時刻</small><h2 id="discoverTitle">可添加行程</h2></div></div><button id="viewAll" class="link-button" type="button">查看全部 <svg><use href="#i-chevron"/></svg></button></div><div id="serviceList" class="service-list"></div></section>
+    </div>
+    <div class="planner-actions"><button id="changeTime" type="button"><svg><use href="#i-clock"/></svg><span>修改時間</span></button><button id="savePlan" class="primary" type="button"><svg><use href="#i-check"/></svg><span>保存行程</span></button><button id="viewWaitlist" type="button"><svg><use href="#i-bell"/></svg><span>查看候補</span></button></div>
+  </section>
+  <section id="agentScreen" class="screen agent-screen" aria-label="智能助手對話">
+    <header class="agent-header"><div class="agent-top"><button id="backToPlanner" class="back-button" type="button" aria-label="返回行程"><svg><use href="#i-back"/></svg></button><div><h1>CX251 <span>→</span> 倫敦希斯路</h1><p>登機時間 <b>19:20</b><i></i> 登機口 <b id="agentGate">25</b></p><p class="agent-time">貴賓室預留時間：<strong>1小時45分鐘</strong></p></div><span class="location"><svg><use href="#i-pin"/></svg>香港國際機場</span></div><button id="planPreview" class="plan-preview" type="button"><span class="preview-title"><span class="round-icon dark small"><svg><use href="#i-calendar"/></svg></span><b>目前計劃</b></span><span id="previewStatus" class="green-pill"><svg><use href="#i-check"/></svg> 已安排</span><svg class="preview-chevron"><use href="#i-chevron"/></svg><div id="miniTimeline" class="mini-timeline"></div></button><div class="agent-presence"><svg><use href="#i-spark"/></svg><b id="agentModeLabel">演示模式 · 未連接 AI</b><span></span></div><a id="liveModeLink" class="demo-link" href="http://127.0.0.1:8765/" hidden>目前是演示頁面，點此開啟本機 AI →</a></header>
+    <div id="chatLog" class="chat-log" aria-live="polite"></div>
+    <div class="composer"><div class="composer-row"><span class="composer-spark"><svg><use href="#i-spark"/></svg></span><input id="requestInput" aria-label="輸入訊息" placeholder="輸入您的需求、突發情況或詢問智能助手…"><button id="sendButton" class="send-button" type="button" aria-label="發送訊息"><svg><use href="#i-send"/></svg></button><button id="micButton" class="mic-button" type="button" aria-label="開始語音輸入"><svg><use href="#i-mic"/></svg></button></div><p id="voiceStatus" class="voice-status" role="status" aria-live="polite"></p><select id="speechLang" class="sr-only" aria-label="語音語言"><option value="zh-HK">廣東話</option><option value="zh-CN">普通話</option><option value="zh-TW">國語</option></select><div class="quick-actions"><button type="button" data-quick="view"><svg><use href="#i-calendar"/></svg>查看行程</button><button type="button" data-quick="optimize"><svg><use href="#i-refresh"/></svg>重新優化</button><button type="button" data-quick="compare"><svg><use href="#i-list"/></svg>貴賓室對比</button><button type="button" data-quick="incident"><svg><use href="#i-alert"/></svg>突發修改</button></div></div>
+  </section>
+</main>
+<dialog id="sheet" class="sheet"><div class="sheet-head"><div><small id="sheetEyebrow">行程管理</small><h2 id="sheetTitle"></h2></div><button id="closeSheet" type="button" aria-label="關閉"><svg><use href="#i-close"/></svg></button></div><div id="sheetBody"></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./app.js"></script>
+</body>
 </html>
