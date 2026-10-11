@@ -1,0 +1,7 @@
+{
+  "lateEvent": {"id":"passenger:1","type":"PASSENGER_LATE","source":"passenger","timestamp":"2026-10-11T17:25:00+08:00","flightNumber":"CX251","passengerId":"demo-user","previousValue":null,"updatedValue":{"delayMinutes":20},"payload":{"baseline":"plannedLoungeArrivalAt"}},
+  "departureDelayEvent": {"id":"flight:1","type":"FLIGHT_DELAYED","source":"mock_flight_provider","timestamp":"2026-10-11T17:25:00+08:00","flightNumber":"CX251","sourceVersion":1,"previousValue":"2026-10-11T20:00:00+08:00","updatedValue":"2026-10-11T20:30:00+08:00","payload":{}},
+  "boardingEvent": {"id":"flight:2","type":"BOARDING_TIME_CHANGED","source":"mock_flight_provider","timestamp":"2026-10-11T17:26:00+08:00","flightNumber":"CX251","sourceVersion":2,"previousValue":"2026-10-11T19:20:00+08:00","updatedValue":"2026-10-11T19:50:00+08:00","payload":{}},
+  "gateEvent": {"id":"flight:3","type":"GATE_CHANGED","source":"mock_flight_provider","timestamp":"2026-10-11T17:27:00+08:00","flightNumber":"CX251","sourceVersion":3,"previousValue":"25","updatedValue":"65","payload":{}},
+  "sampleGateRecoverySummary": {"type":"itinerary_proposal","feasibility":"feasible","requiresConfirmation":true,"operations":[{"op":"update","id":4,"startAt":"2026-10-11T18:45:00+08:00","endAt":"2026-10-11T19:10:00+08:00"},{"op":"remove","id":3}],"walkingTimeSource":"synthetic","note":"这是摘要；完整结果含 draft、约束、revision 和签名，请运行 node recovery/demo.js。"}
+}

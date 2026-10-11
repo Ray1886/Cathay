@@ -1,4 +1,5 @@
 const ENGINE = typeof module!=='undefined'&&module.exports ? require('./itinerary.js') : globalThis.ItineraryEngine;
+const TRAVEL = typeof module!=='undefined'&&module.exports ? require('./travel-time.js') : globalThis.LoungeTravelTimes||ENGINE.travel;
 const TYPES = {
   shower: {...ENGINE.SERVICES.shower,icon:'shower',slots:['16:30','17:00','17:30']},
   dining: {...ENGINE.SERVICES.dining,icon:'dining',slots:['17:30','18:00','18:30']},
@@ -16,6 +17,7 @@ const DEFAULT = [
 const STORAGE = 'lounge-itinerary-v2';
 const ARRIVAL_STORAGE = 'lounge-arrival-time-v1';
 const BOARDING_STORAGE = 'lounge-boarding-time-v1';
+const JOURNEY_STORAGE = 'lounge-recovery-journey-v1';
 const PREFERENCE_STORAGE = 'lounge-preference-history-v1';
 const BOOKING_STORAGE = 'lounge-booking-alerts-v1';
 const DEMO_AGGREGATE_PREFERENCE = {shower:72,dining:68,massage:55,rest:61,work:34};
@@ -23,11 +25,14 @@ const $ = (s) => document.querySelector(s);
 const icon = (name) => '<svg aria-hidden="true"><use href="#i-' + name + '"/></svg>';
 const esc = (v) => String(v).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const minutes = (t) => { const [h,m] = t.split(':').map(Number); return h * 60 + m; };
-const clock = (n) => String(Math.floor(n/60)).padStart(2,'0') + ':' + String(n%60).padStart(2,'0');
+const clock = (n) => {n=((n%1440)+1440)%1440;return String(Math.floor(n/60)).padStart(2,'0') + ':' + String(n%60).padStart(2,'0')};
 let activities = typeof document === 'undefined' ? [] : readSaved();
 let arrivalTime = typeof document === 'undefined' ? '17:30' : readArrivalTime();
 let boardingTime = typeof document === 'undefined' ? '19:20' : readBoardingTime();
 let gate = typeof document === 'undefined' ? '25' : readGate();
+let recoveryJourney=typeof document==='undefined'?null:readJourney();
+let recoveryBusy=false,recoveryRisk='';
+if(recoveryJourney){arrivalTime=recoveryJourney.expectedLoungeArrivalAt.slice(11,16);boardingTime=recoveryJourney.boardingAt.slice(11,16);gate=recoveryJourney.gate;}
 let nextId = Math.max(0,...activities.map(a=>a.id)) + 1;
 let editingId = null;
 let reorderMode = false;
@@ -59,7 +64,8 @@ function readGate(){ try { return localStorage.getItem(STORAGE+'-gate') || '25';
 function readArrivalTime(){try{const value=localStorage.getItem(ARRIVAL_STORAGE);return /^\d{2}:\d{2}$/.test(value||'')&&minutes(value)>=minutes('05:30')&&minutes(value)<=minutes('19:00')?value:'17:30'}catch(_){return '17:30'}}
 function readBoardingTime(){try{const value=localStorage.getItem(BOARDING_STORAGE);return /^\d{2}:\d{2}$/.test(value||'')&&minutes(value)>minutes('17:30')?value:'19:20'}catch(_){return '19:20'}}
 function readBookingAlerts(){try{const value=JSON.parse(localStorage.getItem(BOOKING_STORAGE));return Array.isArray(value)?value:[]}catch(_){return []}}
-function save(){ try { localStorage.setItem(STORAGE,JSON.stringify(activities)); localStorage.setItem(STORAGE+'-gate',gate);localStorage.setItem(ARRIVAL_STORAGE,arrivalTime);localStorage.setItem(BOARDING_STORAGE,boardingTime);localStorage.setItem(BOOKING_STORAGE,JSON.stringify(bookingAlerts)); } catch (_) {} }
+function readJourney(){try{const value=JSON.parse(localStorage.getItem(JOURNEY_STORAGE));return value&&typeof value.gate==='string'&&typeof value.boardingAt==='string'&&typeof value.expectedLoungeArrivalAt==='string'&&Number.isFinite(Date.parse(value.boardingAt))&&Number.isFinite(Date.parse(value.expectedLoungeArrivalAt))?value:null}catch(_){return null}}
+function save(){ try { localStorage.setItem(STORAGE,JSON.stringify(activities)); localStorage.setItem(STORAGE+'-gate',gate);localStorage.setItem(ARRIVAL_STORAGE,arrivalTime);localStorage.setItem(BOARDING_STORAGE,boardingTime);localStorage.setItem(BOOKING_STORAGE,JSON.stringify(bookingAlerts));if(recoveryJourney)localStorage.setItem(JOURNEY_STORAGE,JSON.stringify(recoveryJourney)); } catch (_) {} }
 function readPreferenceHistory(){try{const value=JSON.parse(localStorage.getItem(PREFERENCE_STORAGE));return Array.isArray(value)?value.filter(Array.isArray):[]}catch(_){return []}}
 function recordPreferenceSnapshot(){
   try{
@@ -97,7 +103,9 @@ function parseTypes(text,selections=new Set()){
 function planActivities(requested){
   let cursor=minutes(arrivalTime);
   const scheduled=[], omitted=[];
-  const gateArrival=minutes(boardingTime)-10,gateStart=gateArrival-10;
+  const walk=walkingMinutes(lastLoungeLocation());
+  if(walk===null)return {scheduled:[],omitted:[...requested]};
+  const gateArrival=minutes(boardingTime)-10,gateStart=gateArrival-walk;
   for(const type of requested){
     if(type==='gate'||!TYPES[type])continue;
     const end=cursor+TYPES[type].duration;
@@ -130,19 +138,19 @@ function voiceErrorMessage(error){
     'aborted':'語音輸入已停止。'
   })[error] || '語音辨識未能啟動，請改用文字輸入。';
 }
-function sorted(){ return [...activities].sort((a,b)=>minutes(a.start)-minutes(b.start)); }
-function latestGateArrival(){return clock(minutes(boardingTime)-10)}
+function sorted(){ return [...activities].sort((a,b)=>ENGINE.activityTimes(a,{journey:recoveryJourney}).start-ENGINE.activityTimes(b,{journey:recoveryJourney}).start); }
+function gateDeadline(){return recoveryJourney?Math.min(...[recoveryJourney.boardingAt,recoveryJourney.boardingCutoffAt].filter(Boolean).map(Date.parse))-10*60000:null;}
+function hkClock(epoch){return new Date(epoch+8*3600000).toISOString().slice(11,16)}
+function latestGateArrival(){return recoveryJourney?hkClock(gateDeadline()):clock(minutes(boardingTime)-10)}
 function walkingMinutes(locationId,targetGate=gate){
-  const anchor=ENGINE.LOCATIONS[locationId]?.referenceGate;
-  const destination=Number(targetGate);
-  return Number.isFinite(anchor)&&Number.isFinite(destination)?Math.min(22,Math.max(4,Math.round(Math.abs(anchor-destination)*.28)+4)):10;
+  return TRAVEL?TRAVEL.estimate(locationId,targetGate).minutes:null;
 }
-function latestLoungeDeparture(locationId){return clock(minutes(boardingTime)-10-walkingMinutes(locationId))}
+function latestLoungeDeparture(locationId){const walk=walkingMinutes(locationId);return walk===null?'未知':recoveryJourney?hkClock(gateDeadline()-walk*60000):clock(minutes(boardingTime)-10-walk)}
 function lastLoungeLocation(){return sorted().filter(item=>item.type!=='gate').at(-1)?.locationId||'wing'}
-function availableDuration(){const total=Math.max(0,minutes(latestLoungeDeparture(lastLoungeLocation()))-minutes(arrivalTime));return Math.floor(total/60)+'小時'+String(total%60).padStart(2,'0')+'分'}
+function availableDuration(){const walk=walkingMinutes(lastLoungeLocation());if(walk===null)return '時間待確認';const total=Math.max(0,recoveryJourney?(gateDeadline()-walk*60000-Date.parse(recoveryJourney.actualLoungeArrivalAt||recoveryJourney.expectedLoungeArrivalAt))/60000:minutes(latestLoungeDeparture(lastLoungeLocation()))-minutes(arrivalTime));return Math.floor(total/60)+'小時'+String(total%60).padStart(2,'0')+'分'}
 function locationLine(itemOrType,locationId){
   const item=typeof itemOrType==='string'?{type:itemOrType,locationId:locationId||TYPES[itemOrType].locationId}:itemOrType;
-  if(item.type==='gate')return TYPES.gate.venue;
+  if(item.type==='gate'){const walk=walkingMinutes(lastLoungeLocation());return walk===null?'步行路線未知':('示範步行約 '+walk+' 分鐘');}
   const resolved=ENGINE.resolveServiceLocation(item.type,item.locationId);
   return resolved.venue+' · '+resolved.area;
 }
@@ -152,6 +160,10 @@ function statusMarkup(item){
   return '<span class="status '+esc(item.status)+'">'+(item.status==='pending'?icon('clock'):icon('check'))+esc(labels[item.status]||'已添加')+'</span>';
 }
 function render(){
+  if(recoveryJourney){const checked=ENGINE.validateItinerary(activities,proposalPolicy());recoveryRisk=checked.valid?'':checked.errors.join(' ');}
+  if(recoveryJourney){$('#planWarnings').hidden=!recoveryRisk;$('#planWarnings').textContent=recoveryRisk;}
+  $('#previewStatus').textContent=recoveryRisk?'需调整行程':'已安排';
+  $('#remainingText').setAttribute?.('aria-live','polite');
   const list=$('#activityList');
   list.classList.toggle('reorder-mode',reorderMode);
   list.innerHTML=sorted().map((item,index)=>{
@@ -171,7 +183,7 @@ function render(){
   const recommendation=$('#boardingRecommendation');
   if(recommendation)recommendation.textContent='建議最晚 '+departure+' 離開 '+(ENGINE.LOCATIONS[lastLoungeLocation()]?.shortName||'貴賓室')+'，'+latestGateArrival()+' 前抵達登機口';
   const pendingCount=activities.filter(a=>a.status==='pending').length;
-  $('#remainingText').textContent=pendingCount?pendingCount+' 項服務正在候補':'行程已準備就緒';
+  $('#remainingText').textContent=recoveryRisk?'最新约束下行程存在冲突，请查看恢复建议':pendingCount?pendingCount+' 項服務正在候補':'行程已準備就緒';
   const bookingNotice=$('#bookingNotice');
   bookingNotice.hidden=!bookingAlerts.length;
   bookingNotice.textContent=bookingAlerts.length?'預約提醒：'+bookingAlerts.at(-1):'';
@@ -203,7 +215,7 @@ function renderChat(){
       if(!massage)content='<div class="message-title">'+icon('check')+'按摩時段已從示範行程移除</div><p>需要時可從「可添加行程」重新選擇。</p>';
       else content='<div class="opportunity-inner"><div class="opportunity-photo"></div><div class="opportunity-copy"><strong>✦ 按摩候補進度</strong><p>查看示範空位與排隊名次；實際預約資料尚未連接。</p><div class="opportunity-actions">'+(massage.status==='confirmed'?'<span class="status confirmed">'+icon('check')+'已確認</span>':'<button data-chat="availability">查看候補詳情</button>')+'</div></div></div>';
     }
-    if(m.kind==='gate') content='<div class="message-title">'+icon('plane')+'登機口已改為 G'+esc(gate)+'</div><p>為確保您有充足時間前往登機口，我們已將離開貴賓室的時間調整為 19:00。</p>';
+    if(m.kind==='gate') content='<div class="message-title">'+icon('plane')+'模擬登機口 G'+esc(gate)+'</div><p>請檢查最新步行約束與恢復草案，確認前原行程保持不變。</p>';
     if(m.kind==='updated') content='<div class="message-title">'+icon('check')+'行程時間已更新</div><p>請按最新登機口與候機時間檢查行程；服務預約狀態仍以實際預約系統為準。</p>';
     if(m.kind==='proposal'){
       const proposal=m.proposal;
@@ -213,13 +225,14 @@ function renderChat(){
         const time=change.kind==='updated'?change.before.start+' → '+change.after.start:item.start;
         return '<span class="proposal-change '+change.kind+'">'+esc(label)+' · '+esc(time)+' '+esc(TYPES[item.type].label)+'</span>';
       }).join('');
-      const rows=[...proposal.draft].sort((a,b)=>minutes(a.start)-minutes(b.start)).map(item=>{
+      const rows=[...proposal.draft].sort((a,b)=>ENGINE.activityTimes(a,proposalPolicy()).start-ENGINE.activityTimes(b,proposalPolicy()).start).map(item=>{
         const changed=proposal.diff.some(change=>change.after?.id===item.id);
         const status={confirmed:'已確認',pending:'候補／需確認',added:'已規劃',none:'出發'}[item.status]||'已規劃';
-        return '<div class="proposal-row '+(changed?'changed':'')+'"><strong>'+esc(item.start)+'–'+esc(item.end)+'</strong><span>'+esc(item.type==='gate'?'前往 G'+gate+' 登機口':TYPES[item.type].label)+'</span><small>'+esc(status)+'</small></div>';
+        const day=item.startAt&&recoveryJourney&&item.startAt.slice(0,10)!==recoveryJourney.plannedLoungeArrivalAt.slice(0,10)?item.startAt.slice(5,10)+' ':'';
+        return '<div class="proposal-row '+(changed?'changed':'')+'"><strong>'+esc(day+item.start)+'–'+esc(item.end)+'</strong><span>'+esc(item.type==='gate'?'前往 G'+gate+' 登機口':TYPES[item.type].label)+'</span><small>'+esc(status)+'</small></div>';
       }).join('');
       const warning=proposal.warnings.length?'<div class="proposal-warnings">'+proposal.warnings.map(value=>'<p>'+esc(value)+'</p>').join('')+'</div>':'';
-      const actions=proposal.status==='pending'?'<div class="proposal-actions"><button type="button" data-proposal="cancel" data-index="'+index+'">取消修改</button><button type="button" data-proposal="confirm" data-index="'+index+'">確認並保存</button></div>':'<div class="proposal-result">'+esc({applied:'已確認並保存',cancelled:'已取消修改',stale:'行程已變動，請重新提出修改'}[proposal.status]||'')+'</div>';
+      const actions=proposal.status==='pending'?'<div class="proposal-actions"><button type="button" data-proposal="cancel" data-index="'+index+'">取消修改</button><button type="button" data-proposal="confirm" data-index="'+index+'">確認並保存</button></div>':'<div class="proposal-result">'+esc({confirming:'正在核对并保存…',applied:'已確認並保存',cancelled:'已取消修改',stale:'行程已變動，請重新提出修改'}[proposal.status]||'')+'</div>';
       content='<div class="message-title">'+icon('calendar')+'行程修改預覽</div><p>'+esc(proposal.explanation)+'</p><div class="proposal-changes">'+changes+'</div><div class="proposal-list">'+rows+'</div>'+warning+(proposal.error?'<p class="proposal-error">'+esc(proposal.error)+'</p>':'')+actions;
     }
     return '<div class="chat-message '+(user?'user':'agent')+' '+(m.kind||'')+'"><span class="avatar">'+icon(user?'rest':'spark')+'</span><div class="bubble">'+content+'<time>'+esc(m.time||nowTime())+'</time></div></div>';
@@ -262,13 +275,13 @@ function locationCard(type,locationId){
   const resolved=ENGINE.resolveServiceLocation(type,locationId),location=ENGINE.LOCATIONS[resolved.locationId];
   return '<small>實際貴賓室設施</small><strong>'+esc(location.name)+' · '+esc(resolved.area)+'</strong><span>'+esc(location.address)+'</span><a href="'+esc(location.url)+'" target="_blank" rel="noopener noreferrer">查看國泰官方介紹 ↗</a>';
 }
-function proposalPolicy(original=activities){return {gate,boardingTime,windowStart:arrivalTime,windowEnd:latestGateArrival(),boardingBuffer:10,originalActivities:original}}
+function proposalPolicy(original=activities){return {gate,boardingTime,windowStart:arrivalTime,windowEnd:latestGateArrival(),boardingBuffer:10,walkingMinutes:walkingMinutes(lastLoungeLocation()),enforceTransfers:true,journey:recoveryJourney,originalActivities:original}}
 function showArrivalSheet(){
   showSheet('修改到達時間','<form id="arrivalForm"><label class="field">到達貴賓室時間<input id="arrivalInput" type="time" min="05:30" max="19:00" value="'+esc(arrivalTime)+'" required></label><p class="sheet-note">到達時間可早於 17:30。新的活動可從到達後開始；若改為較晚到達，請先調整較早的活動。</p><p id="arrivalError" class="sheet-error" role="alert"></p><button class="sheet-primary" type="submit">保存到達時間</button></form>','行程時間');
 }
 function showBoardingSheet(){
   const selected=lastLoungeLocation();
-  showSheet('修改登機時間','<form id="boardingForm"><label class="field">登機時間<input id="boardingInput" type="time" value="'+esc(boardingTime)+'" required></label><div id="boardingSuggestion" class="location-card"><small>系統安全建議</small><strong>最晚 '+esc(latestGateArrival())+' 抵達登機口</strong><span>從 '+esc(ENGINE.LOCATIONS[selected].shortName)+' 出發，建議最晚 '+esc(latestLoungeDeparture(selected))+' 離開；步行時間為原型估算。</span></div><p class="sheet-note">保存後會把「前往登機口」安排在建議抵達時間之前，並檢查現有活動是否衝突。</p><p id="boardingError" class="sheet-error" role="alert"></p><button class="sheet-primary" type="submit">保存登機時間</button></form>','航班時間');
+  showSheet('修改登機時間','<form id="boardingForm"><label class="field">登機時間<input id="boardingInput" type="time" value="'+esc(boardingTime)+'" required></label><div id="boardingSuggestion" class="location-card"><small>系統安全建議</small><strong>最晚 '+esc(latestGateArrival())+' 抵達登機口</strong><span>從 '+esc(ENGINE.LOCATIONS[selected].shortName)+' 出發，建議最晚 '+esc(latestLoungeDeparture(selected))+' 離開；步行時間為虛構示範。</span></div><p class="sheet-note">這會產生模擬航空事件，檢查影響並預覽恢復草案；確認後才修改行程。跨午夜請使用「突發修改」的完整日期。</p><p id="boardingError" class="sheet-error" role="alert"></p><button class="sheet-primary" type="submit">檢查新的登機時間</button></form>','航班時間');
 }
 function waitlistContent(data){
   const slots=Array.isArray(data?.slots)?data.slots:[];
@@ -296,7 +309,7 @@ function stageProposal(payload){
   if(!ENGINE){addMessage('agent','行程驗證模組尚未載入，請重新整理頁面。');return false}
   try{
     const original=activities.map(item=>({...item}));
-    const draft=ENGINE.applyProposalToDraft(original,payload.operations);
+    const draft=ENGINE.applyProposalToDraft(original,payload.operations,proposalPolicy(original));
     const checked=ENGINE.validateItinerary(draft,proposalPolicy(original));
     if(!checked.valid){addMessage('agent','目前無法預覽這項修改：'+checked.errors.join(' '));return false}
     const diff=ENGINE.diffItineraries(original,draft);
@@ -304,7 +317,7 @@ function stageProposal(payload){
     const proposal={operations:payload.operations.map(operation=>({...operation})),draft,diff,
       explanation:payload.explanation||'請檢查以下建議行程。',
       warnings:[...new Set([...(Array.isArray(payload.warnings)?payload.warnings:[]),...checked.warnings])],
-      baseSignature:ENGINE.itinerarySignature(original,proposalPolicy(original)),status:'pending',error:''};
+      baseSignature:ENGINE.itinerarySignature(original,proposalPolicy(original)),recoveryPreviewId:payload.recoveryPreviewId||null,status:'pending',error:''};
     messages.push({role:'agent',kind:'proposal',text:proposal.explanation,proposal,time:nowTime()});renderChat();
     return true;
   }catch(error){addMessage('agent','無法建立安全的行程預覽：'+error.message);return false}
@@ -313,14 +326,15 @@ function decideProposal(index,decision){
   const entry=messages[index],proposal=entry?.proposal;
   if(!proposal||proposal.status!=='pending')return false;
   if(decision==='cancel'){
-    proposal.status='cancelled';renderChat();addMessage('agent','已取消這次修改，原有行程保持不變。');return true;
+    proposal.status='cancelled';renderChat();addMessage('agent','已取消這次修改，原有行程保持不變。'+(proposal.recoveryPreviewId?' 最新航班或到達約束仍有效，請留意行程衝突。':''));return true;
   }
   if(decision!=='confirm')return false;
+  if(proposal.recoveryPreviewId)return confirmRecovery(proposal);
   if(ENGINE.itinerarySignature(activities,proposalPolicy())!==proposal.baseSignature){
     proposal.status='stale';renderChat();addMessage('agent','行程已在預覽後變更。請重新提出需求，我會按最新行程產生預覽。');return false;
   }
   try{
-    const draft=ENGINE.applyProposalToDraft(activities,proposal.operations);
+    const draft=ENGINE.applyProposalToDraft(activities,proposal.operations,proposalPolicy());
     const checked=ENGINE.validateItinerary(draft,proposalPolicy());
     if(!checked.valid){proposal.error=checked.errors.join(' ');renderChat();return false}
     activities=draft;
@@ -356,8 +370,8 @@ function generatePlan(text){
   return true;
 }
 function currentContext(){
-  return {flightNumber:'CX251',boardingTime,gate,windowStart:arrivalTime,windowEnd:latestGateArrival(),boardingBuffer:10,
-    activities:sorted().map(a=>({id:a.id,type:a.type,label:TYPES[a.type].label,start:a.start,end:a.end,status:a.status,locationId:a.locationId,venue:a.venue,area:a.area||ENGINE.resolveServiceLocation(a.type,a.locationId).area}))};
+  return {...proposalPolicy(),originalActivities:undefined,flightNumber:'CX251',
+    activities:sorted().map(a=>({id:a.id,type:a.type,label:TYPES[a.type].label,start:a.start,end:a.end,...(a.startAt?{startAt:a.startAt,endAt:a.endAt}:{}),status:a.status,locationId:a.locationId,venue:a.venue,area:a.area||ENGINE.resolveServiceLocation(a.type,a.locationId).area,reservationId:a.reservationId,loungeServiceId:a.loungeServiceId}))};
 }
 async function checkAgentMode(){
   if(typeof location==='undefined')return;
@@ -402,12 +416,20 @@ async function sendMessage(){
   const history=messages.filter(m=>m.text).slice(-8).map(m=>({role:m.role,text:m.text}));
   chatTouched=true;
   input.value=''; addMessage('user',text);
+  if(!/如果|假如|假設|假设/.test(text)&&/晚到|遲到|迟到/.test(text)){
+    const delay=text.match(/(?:晚到|遲到|迟到)\s*(\d+)\s*(?:分鐘|分钟|分)?/);
+    const expected=text.match(/(?:[01]\d|2[0-3]):[0-5]\d/);
+    if(delay){await runRecovery('late',delay[1]);return;}
+    if(expected){const day=recoveryJourney?.plannedLoungeArrivalAt.slice(0,10)||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Hong_Kong',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());await runRecovery('late',0,day+'T'+expected[0]+':00+08:00');return;}
+    addMessage('agent','請提供晚到分鐘數，例如「我會晚到 20 分鐘」，或在「突發修改」輸入完整預計到達時間。');return;
+  }
   if(/確認.{0,8}按摩|按摩.{0,8}確認/.test(text)){addMessage('agent','目前沒有連接實際預約系統。您可以在「查看候補」查看示範空位與排隊名次。');showWaitlist();return}
   if(aiMode!=='live'){demoReply(text);return}
   sending=true; $('#sendButton').disabled=true; input.disabled=true;
   const pending={role:'agent',text:'正在根據您的行程整理建議…',kind:'thinking',time:nowTime()};
   messages.push(pending); renderChat();
   try{
+    const requestSignature=ENGINE.itinerarySignature(activities,proposalPolicy());
     const response=await fetch('./api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history,context:currentContext()})});
     if(!response.ok){
       const failure=await response.json().catch(()=>({}));
@@ -415,7 +437,10 @@ async function sendMessage(){
     }
     const result=await response.json();
     messages=messages.filter(m=>m!==pending);
-    if(result.type==='itinerary_proposal')stageProposal(result);
+    if(result.type==='itinerary_proposal'){
+      if(requestSignature!==ENGINE.itinerarySignature(activities,proposalPolicy()))addMessage('agent','取得 AI 建議期間行程或航班約束已變動，請重新提出需求。');
+      else stageProposal(result);
+    }
     else if(typeof result.reply==='string'&&result.reply.trim())addMessage('agent',result.reply.trim());
     else throw new Error('EMPTY_AI_RESPONSE');
   }catch(error){
@@ -449,7 +474,47 @@ function showRecommendations(){
   showSheet('智能推薦','<p class="sheet-note">依本機已保存行程的個人偏好及示範群體偏好排序。群體比例為原型樣本，並非真實所有旅客資料。</p><div class="recommend-list">'+cards+'</div>','為您推薦');
 }
 function openIncident(){
-  showSheet('突發修改','<button class="sheet-choice" data-incident="gate"><strong>登機口改為 G31</strong><small>同步更新行程及離開時間</small></button><button class="sheet-choice" data-incident="late"><strong>我會晚到 10 分鐘</strong><small>重新檢查活動銜接與時間</small></button><button class="sheet-choice" data-incident="delay"><strong>航班延誤</strong><small>保留現有服務並等待最新資訊</small></button>','智能應變');
+  showSheet('突發修改','<form id="incidentForm"><p class="sheet-note">晚到由旅客報告；航班變動由本機模擬提供者產生，並非即時航空資料。先檢查影響並預覽，確認後才保存行程。</p><label class="field">變動類型<select id="incidentType"><option value="late">我會晚到</option><option value="gate">模擬登機口變更</option><option value="delay">模擬起飛延誤</option><option value="boarding">模擬登機時間變更</option></select></label><label class="field"><span id="incidentValueLabel">晚到分鐘數</span><input id="incidentValue" value="20" required></label><label class="field">可選：完整預計到達／登機時間<input id="incidentAt" type="datetime-local"></label><p id="incidentHint" class="sheet-note">分鐘相對原计划到達時間計算，不會在上次晚到時間上累加。跨午夜請填完整日期。</p><button class="sheet-primary" type="submit">檢查影響並產生恢復建議</button></form>','突發恢復引擎');
+}
+async function recoveryPost(route,body){const response=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw new Error(result.error||'RECOVERY_FAILED');return result;}
+async function runRecovery(action,value,fullTime){
+  if(recoveryBusy){toast('正在處理上一個突發事件，請稍候。');return false;}
+  recoveryBusy=true;chatTouched=true;showScreen('agent');
+  const before=ENGINE.itinerarySignature(activities,proposalPolicy());
+  try{
+    const data=await recoveryPost('./api/recovery',{action,value,...(fullTime?{[action==='late'?'expectedArrivalAt':'boardingAt']:fullTime}:{}),context:currentContext()});
+    if(before!==ENGINE.itinerarySignature(activities,proposalPolicy())){addMessage('agent','檢查期間行程已改變，請重新模擬這次事件。');return false;}
+    if(data.impact.eventStatus==='rejected'){addMessage('agent','事件未接受：'+data.impact.eventErrors.join(' '));return false;}
+    recoveryJourney=data.state;arrivalTime=data.state.expectedLoungeArrivalAt.slice(11,16);boardingTime=data.state.boardingAt.slice(11,16);gate=data.state.gate;
+    messages.forEach(message=>{if(message.proposal?.status==='pending')message.proposal.status='stale';});
+    const facts={late:'旅客預計到達 '+arrivalTime,gate:'模擬登機口改為 G'+gate,delay:'模擬起飛估計 '+data.state.estimatedDepartureAt.slice(11,16)+'；登機時間未自動延後',boarding:'模擬登機時間改為 '+boardingTime};
+    addMessage('agent',(facts[action]||'旅程資料更新')+'。原行程尚未修改。','system');
+    save();render();
+    if(data.proposal)stageProposal({...data.proposal,recoveryPreviewId:data.previewId});
+    else addMessage('agent',data.result.explanation,'system');
+    if(aiMode==='live'){
+      const revision=recoveryJourney.revision;
+      try{const explanation=await recoveryPost('./api/recovery/explain',{previewId:data.previewId});if(recoveryJourney.revision===revision)addMessage('agent',explanation.reply);}
+      catch(_){addMessage('agent','DeepSeek 暫時無法解釋這次建議；恢復引擎的校驗與草案仍可使用。');}
+    }
+    return true;
+  }catch(error){addMessage('agent','無法處理這次突發事件，請檢查分鐘、登機口或日期。原行程保持不變。');return false;}
+  finally{recoveryBusy=false;}
+}
+async function confirmRecovery(proposal){
+  if(proposal.status!=='pending')return false;
+  if(ENGINE.itinerarySignature(activities,proposalPolicy())!==proposal.baseSignature){proposal.status='stale';renderChat();return false;}
+  proposal.status='confirming';renderChat();
+  try{
+    const result=await recoveryPost('./api/recovery/confirm',{previewId:proposal.recoveryPreviewId,context:currentContext()});
+    if(ENGINE.itinerarySignature(activities,proposalPolicy())!==proposal.baseSignature)throw new Error('STALE_RECOVERY');
+    const checked=ENGINE.validateItinerary(result.draft,proposalPolicy());if(!checked.valid)throw new Error('INVALID_RECOVERY');
+    activities=result.draft;recoveryJourney={...recoveryJourney,currentItinerary:activities.map(item=>({...item})),revision:recoveryJourney.revision+1};
+    nextId=Math.max(nextId,...activities.map(item=>item.id+1));
+    bookingAlerts=[...new Set([...bookingAlerts,...result.warnings])].slice(-8);
+    proposal.status='applied';save();render();renderChat();
+    addMessage('agent','已確認並保存恢復行程。實際預約未自動取消或確認；改期服務仍需另行確認。');return true;
+  }catch(error){proposal.status='stale';proposal.error=error.message==='RECOVERY_SLOT_CHANGED'?'空位已變動，請重新產生草案。':'旅程或草案已失效，請重新提出突發修改。';renderChat();return false;}
 }
 function setupVoice(){
   if(window.SpeechRecognition||window.webkitSpeechRecognition)return;
@@ -525,14 +590,14 @@ if(typeof document!=='undefined'){
     if(edit){closeSheet();openEdit(activities.find(a=>a.id===Number(edit.dataset.editId)))}
     if(add){closeSheet();openEdit(null,add.dataset.addType)}
     if(action){closeSheet();showScreen('agent')}
-    if(incident){closeSheet();showScreen('agent');if(incident.dataset.incident==='gate'){gate='31';const g=activities.find(a=>a.type==='gate');if(g){g.start=clock(minutes(latestGateArrival())-10);g.end=latestGateArrival()}render();save();messages.push({role:'agent',kind:'gate',time:nowTime()});renderChat()}if(incident.dataset.incident==='late')addMessage('agent','收到您會晚到 10 分鐘。我會優先保留已安排服務，並建議您檢查淋浴與晚餐的銜接。');if(incident.dataset.incident==='delay')addMessage('agent','已記下航班延誤。此原型使用示範航班資料，待正式資訊更新後可重新優化行程。')}
   });
   $('#sheetBody').addEventListener('change',e=>{
+    if(e.target.id==='incidentType'){const options={late:['20','晚到分鐘數'],gate:['65','新的登機口'],delay:['30','起飛延誤分鐘數'],boarding:[boardingTime,'新的登機時間（HH:MM）']};const selected=options[e.target.value];$('#incidentValue').value=selected[0];$('#incidentValueLabel').textContent=selected[1];$('#incidentAt').value='';$('#incidentAt').disabled=!['late','boarding'].includes(e.target.value);$('#incidentHint').textContent=e.target.value==='delay'?'起飛延誤不會自動延後登機時間。':e.target.value==='gate'?'步行時間來自虚構路线表；未知登機口不會猜測距離。':'跨午夜可填完整日期；所有修改仍需確認。';}
     if(e.target.id==='activityType')$('#activityLocation').innerHTML=locationPicker(e.target.value,TYPES[e.target.value].locationId);
     if(e.target.id==='activityLounge')$('#locationDetails').innerHTML=locationCard($('#activityType').value,e.target.value);
     if(e.target.id==='boardingInput'){
       const value=e.target.value,selected=lastLoungeLocation();
-      if(/^\d{2}:\d{2}$/.test(value))$('#boardingSuggestion').innerHTML='<small>系統安全建議</small><strong>最晚 '+esc(clock(minutes(value)-10))+' 抵達登機口</strong><span>從 '+esc(ENGINE.LOCATIONS[selected].shortName)+' 出發，建議最晚 '+esc(clock(minutes(value)-10-walkingMinutes(selected)))+' 離開；步行時間為原型估算。</span>';
+      if(/^\d{2}:\d{2}$/.test(value))$('#boardingSuggestion').innerHTML='<small>系統安全建議</small><strong>最晚 '+esc(clock(minutes(value)-10))+' 抵達登機口</strong><span>'+esc(walkingMinutes(selected)===null?'步行路線未知，不能推算安全離開時間。':'從 '+ENGINE.LOCATIONS[selected].shortName+' 出發，建議最晚 '+clock(minutes(value)-10-walkingMinutes(selected))+' 離開；步行時間為虛構示範。')+'</span>';
     }
     if(e.target.id==='activityType'||e.target.id==='activityStart'){
       const start=$('#activityStart').value;
@@ -540,24 +605,21 @@ if(typeof document!=='undefined'){
     }
   });
   $('#sheetBody').addEventListener('submit',e=>{
+    if(e.target.id==='incidentForm'){e.preventDefault();const action=$('#incidentType').value,value=$('#incidentValue').value,raw=$('#incidentAt').value;closeSheet();runRecovery(action,value,raw?raw+(raw.length===16?':00':'')+'+08:00':undefined);return;}
     if(e.target.id==='arrivalForm'){
       e.preventDefault();
       const proposed=$('#arrivalInput').value;
       if(!/^\d{2}:\d{2}$/.test(proposed)||minutes(proposed)<minutes('05:30')||minutes(proposed)>minutes('19:00')){$('#arrivalError').textContent='請選擇 05:30 至 19:00 之間的時間。';return}
-      const checked=ENGINE.validateItinerary(activities,{...proposalPolicy(),windowStart:proposed});
+      const nextJourney=recoveryJourney?{...recoveryJourney,plannedLoungeArrivalAt:recoveryJourney.expectedLoungeArrivalAt.slice(0,10)+'T'+proposed+':00+08:00',expectedLoungeArrivalAt:recoveryJourney.expectedLoungeArrivalAt.slice(0,10)+'T'+proposed+':00+08:00',revision:recoveryJourney.revision+1}:null;
+      const checked=ENGINE.validateItinerary(activities,{...proposalPolicy(),windowStart:proposed,journey:nextJourney});
       if(!checked.valid){$('#arrivalError').textContent=checked.errors[0]+' 請先調整較早的活動。';return}
-      arrivalTime=proposed;save();render();closeSheet();toast('到達時間已更新，可安排較早的活動。');return;
+      arrivalTime=proposed;if(nextJourney)recoveryJourney=nextJourney;save();render();closeSheet();toast('到達時間已更新，可安排較早的活動。');return;
     }
     if(e.target.id==='boardingForm'){
       e.preventDefault();
       const proposed=$('#boardingInput').value;
-      if(!/^\d{2}:\d{2}$/.test(proposed)||minutes(proposed)<=minutes(arrivalTime)+20){$('#boardingError').textContent='登機時間必須晚於到達時間至少 20 分鐘。';return}
-      const oldBoarding=boardingTime;boardingTime=proposed;
-      const gateItem=activities.find(item=>item.type==='gate');
-      if(gateItem){gateItem.end=latestGateArrival();gateItem.start=clock(minutes(gateItem.end)-10)}
-      const checked=ENGINE.validateItinerary(activities,proposalPolicy());
-      if(!checked.valid){boardingTime=oldBoarding;if(gateItem){gateItem.end=clock(minutes(oldBoarding)-10);gateItem.start=clock(minutes(gateItem.end)-10)}$('#boardingError').textContent=checked.errors[0]+' 請先調整較晚的活動。';return}
-      save();render();closeSheet();toast('登機時間與最晚前往登機口時間已更新。');return;
+      if(!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(proposed)){$('#boardingError').textContent='請輸入有效登機時間。';return}
+      closeSheet();runRecovery('boarding',proposed);return;
     }
     if(e.target.id!=='activityForm')return;e.preventDefault();
     const type=$('#activityType').value;

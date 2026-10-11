@@ -61,6 +61,32 @@ npm run demo:reservations
 
 自動測試與端到端演示使用臨時資料庫。演示會實際修改本機資料庫：A 預約最後一個 18:40 按摩名額，B 候補，A 取消後系統向 B 發出邀請，B 接受後成為已確認預約；最後重新啟動獨立伺服器進程驗證資料保留。
 
-現有頁面仍由 `node server.js`（或 `npm start`）在 `http://127.0.0.1:8765/` 提供。**本階段尚未將預約 API 掛載至 `server.js`，也未更改前端或 Agent 行為**；`/api/availability`、候補畫面及 localStorage 中的預約標籤仍使用既有示範資料。4174 是獨立 JSON API，不是介面網址。
+現有頁面由 `node server.js`（或 `npm start`）在 `http://127.0.0.1:8765/` 提供。主服務啟動時初始化本機示範資料庫，恢復引擎只讀取空位與預約；`/api/availability`、候補畫面仍使用既有示範資料。4174 仍是獨立預約 JSON API，不是介面網址。
 
 參閱[安裝與 Windows 啟動](docs/reservations/README.md)、[資料庫結構與狀態](docs/reservations/schema.md)、[HTTP API](docs/reservations/api.md)、[現有前端與 Agent 整合指南](docs/reservations/integration.md)。
+
+## 突发修改与恢复
+
+主界面的「突发修改」支持晚到、模拟登机口变更、起飞延误和独立登机时间变化。支持跨午夜日期、动态步行及贵宾室转移约束；未知路线不猜测。系统先更新旅程事实，再生成行程预览，确认后才保存活动。取消草案仍保留新事实与风险提示。
+
+恢复确认会重新核对旅程、活动和示范空位；已确认预约改期变为待确认，从行程移除不自动取消实际预约。DeepSeek 解释恢复建议，AI 失败不影响本地恢复规则。
+
+Ubuntu WSL 使用 Node.js 24.15.0 以上的 24.x 版本，无需安装 npm 依赖：
+
+```bash
+cd /home/lotrave/projects/skyward/Cathay
+node server.js
+```
+
+另开终端隐藏输入密钥，并只配置到服务内存：
+
+```bash
+read -r -s -p 'DeepSeek API Key: ' DEEPSEEK_API_KEY; printf '\n'
+export DEEPSEEK_API_KEY
+node scripts/configure-ai.js
+unset DEEPSEEK_API_KEY
+```
+
+打开 http://127.0.0.1:8765/ ，刷新后使用智能助手。服务重启后需重新配置，配置成功还需实际获得 AI 回复才能验证认证。请勿把密钥贴到聊天、写入源码或提交 Git。
+
+目前 `node --test` 共 112 项测试通过，包括恢复引擎、主界面预览/取消/确认、跨午夜、旧草案拒绝、SQLite 只读与 DeepSeek 模拟解释。详见 [恢复模块](recovery/README.md) 和 [整合契约](recovery/INTEGRATION.md)。

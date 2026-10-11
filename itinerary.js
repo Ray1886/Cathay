@@ -31,6 +31,22 @@
   const fmt=value=>String(Math.floor(value/60)).padStart(2,'0')+':'+String(value%60).padStart(2,'0');
   const clone=items=>items.map(item=>({...item}));
   const fail=message=>{throw new Error(message)};
+  const travel=typeof module!=='undefined'&&module.exports?require('./travel-time.js'):globalThis.LoungeTravelTimes;
+  function timestamp(value){
+    if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-]\d{2}:\d{2})$/.test(value))return NaN;
+    const n=Date.parse(value);if(!Number.isFinite(n))return NaN;
+    const zone=value.slice(19),offset=zone==='Z'?0:(zone[0]==='+'?1:-1)*(Number(zone.slice(1,3))*60+Number(zone.slice(4)));
+    return new Date(n+offset*60000).toISOString().slice(0,19)===value.slice(0,19)?n:NaN;
+  }
+  function activityTimes(item,context={}){
+    if(!context.journey)return {start:mins(item.start),end:mins(item.end)};
+    const journey=context.journey,reference=journey.currentItinerary?.find(a=>a.id===item.id);
+    const anchor=journey.actualLoungeArrivalAt||journey.expectedLoungeArrivalAt;
+    const startAt=item.startAt||(reference?.start===item.start?reference.startAt:null)||(anchor.slice(0,10)+'T'+item.start+':00+08:00');
+    let endAt=item.endAt||(reference?.end===item.end?reference.endAt:null)||(startAt.slice(0,10)+'T'+item.end+':00+08:00');
+    if(!item.endAt&&timestamp(endAt)<timestamp(startAt))endAt=new Date(timestamp(endAt)+86400000+28800000).toISOString().slice(0,19)+'+08:00';
+    return {start:timestamp(startAt),end:timestamp(endAt)};
+  }
   function resolveServiceLocation(type,locationId){
     const service=SERVICES[type];
     if(!service||type==='gate')return {locationId:'gate',venue:SERVICES.gate.venue,area:SERVICES.gate.area};
@@ -39,7 +55,7 @@
     return {locationId:selected,venue:location.name,area:location.areas[type]||service.area};
   }
 
-  function applyProposalToDraft(currentActivities,operations){
+  function applyProposalToDraft(currentActivities,operations,context={}){
     if(!Array.isArray(currentActivities)||!Array.isArray(operations)||!operations.length||operations.length>12)fail('修改項目無效或數量過多。');
     const draft=clone(currentActivities);
     const originalIds=new Set(draft.map(item=>item.id));
@@ -52,7 +68,7 @@
         if(!SERVICES[type]||type==='gate')fail('不能添加未知活動或重複的登機口行程。');
         if(!TIME.test(operation.start||'')||!TIME.test(operation.end||''))fail('新增活動需要有效的開始和結束時間。');
         const location=resolveServiceLocation(type,operation.locationId);
-        draft.push({id:nextId++,type,start:operation.start,end:operation.end,...location,status:SERVICES[type].reservationRequired?'pending':'added'});
+        draft.push({id:nextId++,type,start:operation.start,end:operation.end,...location,...(operation.startAt?{startAt:operation.startAt,endAt:operation.endAt}:{}),status:SERVICES[type].reservationRequired?'pending':'added'});
         continue;
       }
       const id=operation.id;
@@ -70,11 +86,14 @@
       const type=operation.type||previous.type;
       if(!SERVICES[type]||((previous.type==='gate')!==(type==='gate')))fail('活動類型無效，不能更改登機口行程的類型。');
       const start=operation.start||previous.start;
-      const end=operation.end||(operation.start||type!==previous.type?fmt(mins(start)+SERVICES[type].duration):previous.end);
+      const end=operation.end||(operation.start||type!==previous.type?fmt(mins(start)+(type==='gate'&&Number.isInteger(context.walkingMinutes)?context.walkingMinutes:SERVICES[type].duration)):previous.end);
       if(!TIME.test(start)||!TIME.test(end))fail('活動時間格式無效。');
       const location=resolveServiceLocation(type,operation.locationId||(type===previous.type?previous.locationId:null));
       const changed=type!==previous.type||start!==previous.start||end!==previous.end||location.locationId!==previous.locationId;
-      draft[index]={...previous,type,start,end,...location,status:changed&&previous.status==='confirmed'?'pending':previous.status};
+      const next={...previous,type,start,end,...location,status:changed&&previous.status==='confirmed'?'pending':previous.status};
+      if(operation.startAt||operation.endAt){next.startAt=operation.startAt||previous.startAt;next.endAt=operation.endAt||previous.endAt;}
+      else if(changed){delete next.startAt;delete next.endAt;}
+      draft[index]=next;
     }
     return draft;
   }
@@ -83,35 +102,46 @@
     const errors=[],warnings=[];
     if(!Array.isArray(draft))return {valid:false,errors:['行程格式無效。'],warnings};
     const seen=new Set();
-    const windowStart=mins(context.windowStart||'17:30');
-    const windowEnd=mins(context.windowEnd||'19:15');
-    const boarding=mins(context.boardingTime||'19:20');
+    const journey=context.journey,scale=journey?60000:1;
+    const deadlines=journey?[journey.boardingAt,journey.boardingCutoffAt].filter(Boolean).map(timestamp):[];
+    const boarding=journey?(deadlines.length?Math.min(...deadlines):NaN):mins(context.boardingTime||'19:20');
+    const windowStart=journey?timestamp(journey.actualLoungeArrivalAt||journey.expectedLoungeArrivalAt):mins(context.windowStart||'17:30');
     const buffer=Number.isInteger(context.boardingBuffer)?context.boardingBuffer:10;
+    const windowEnd=journey?boarding-buffer*scale:mins(context.windowEnd||'19:15');
+    const walking=Object.hasOwn(context,'walkingMinutes')?context.walkingMinutes:10;
+    if(!Number.isFinite(windowStart)||!Number.isFinite(windowEnd)||!Number.isFinite(boarding)||!Number.isInteger(walking)||walking<1)errors.push('到達、登機時間或步行路線未知，無法安全確認行程。');
     for(const item of draft){
       if(!Number.isInteger(item.id)||seen.has(item.id))errors.push('活動 ID 重複或無效。');
       seen.add(item.id);
       const service=SERVICES[item.type];
       if(!service){errors.push('行程包含未知活動。');continue}
       if(!TIME.test(item.start||'')||!TIME.test(item.end||'')){errors.push(service.label+' 的時間格式無效。');continue}
-      const start=mins(item.start),end=mins(item.end);
+      const {start,end}=activityTimes(item,context);
+      if(!Number.isFinite(start)||!Number.isFinite(end)){errors.push(service.label+' 的日期或時區無效。');continue}
+      if(item.startAt&&item.startAt.slice(11,16)!==item.start||item.endAt&&item.endAt.slice(11,16)!==item.end)errors.push(service.label+' 的顯示時間與時間戳不一致。');
       if(end<=start)errors.push(service.label+' 的結束時間必須晚於開始時間。');
-      if(end-start!==service.duration)errors.push(service.label+' 需安排 '+service.duration+' 分鐘。');
+      const duration=item.type==='gate'?walking:service.duration;
+      if(end-start!==duration*scale)errors.push(service.label+' 需安排 '+duration+' 分鐘。');
       if(start<windowStart||end>windowEnd)errors.push(service.label+' 超出可用貴賓室時段。');
       if(item.type!=='gate'){
         const inferredLocationId=item.locationId||service.locations.find(id=>LOCATIONS[id].name===item.venue)||service.locationId;
         const location=LOCATIONS[inferredLocationId];
         if(!location||!service.locations.includes(inferredLocationId))errors.push(service.label+' 的地點代碼不符。');
         else if(item.venue!==location.name)errors.push(service.label+' 的服務地點不符。');
-      }else if(item.venue!==service.venue)errors.push(service.label+' 的服務地點不符。');
+      }else if(item.venue!==service.venue&&!(context.journey&&item.venue==='示范步行约 '+walking+' 分钟'))errors.push(service.label+' 的服務地點不符。');
       if(!['added','pending','confirmed','none'].includes(item.status))errors.push(service.label+' 的預約狀態無效。');
     }
     const gates=draft.filter(item=>item.type==='gate');
     if(gates.length!==1)errors.push('行程必須保留一項前往登機口活動。');
-    if(gates.length===1&&TIME.test(gates[0].end||'')&&mins(gates[0].end)>boarding-buffer)errors.push('抵達登機口時間不足登機前緩衝。');
-    const ordered=[...draft].filter(item=>TIME.test(item.start||'')&&TIME.test(item.end||'')).sort((a,b)=>mins(a.start)-mins(b.start));
-    for(let index=1;index<ordered.length;index++)if(mins(ordered[index].start)<mins(ordered[index-1].end))errors.push(ordered[index-1].start+' 與 '+ordered[index].start+' 的活動時間重疊。');
+    if(gates.length===1&&activityTimes(gates[0],context).end>boarding-buffer*scale)errors.push('抵達登機口時間不足登機前緩衝。');
+    const ordered=[...draft].filter(item=>TIME.test(item.start||'')&&TIME.test(item.end||'')).sort((a,b)=>activityTimes(a,context).start-activityTimes(b,context).start);
+    for(let index=1;index<ordered.length;index++)if(activityTimes(ordered[index],context).start<activityTimes(ordered[index-1],context).end)errors.push(ordered[index-1].start+' 與 '+ordered[index].start+' 的活動時間重疊。');
+    if(context.enforceTransfers&&travel){
+      const lounges=ordered.filter(item=>item.type!=='gate');
+      for(let i=1;i<lounges.length;i++){const gap=travel.transfer(lounges[i-1].locationId,lounges[i].locationId);if(gap===null||activityTimes(lounges[i],context).start-activityTimes(lounges[i-1],context).end<gap*scale)errors.push('跨貴賓室活動需預留示範步行時間。');}
+    }
     if(gates.length===1&&TIME.test(gates[0].start||''))for(const item of draft){
-      if(item.type!=='gate'&&TIME.test(item.end||'')&&mins(item.end)>mins(gates[0].start))errors.push('活動必須在前往登機口前結束。');
+      if(item.type!=='gate'&&TIME.test(item.end||'')&&activityTimes(item,context).end>activityTimes(gates[0],context).start)errors.push('活動必須在前往登機口前結束。');
     }
     const original=Array.isArray(context.originalActivities)?context.originalActivities:[];
     for(const previous of original.filter(item=>item.status==='confirmed')){
@@ -129,13 +159,13 @@
     for(const item of original){
       const next=after.get(item.id);
       if(!next)changes.push({kind:'removed',before:{...item}});
-      else if(['type','start','end','locationId','venue','status'].some(key=>item[key]!==next[key]))changes.push({kind:'updated',before:{...item},after:{...next}});
+      else if(['type','start','end','startAt','endAt','locationId','venue','status'].some(key=>item[key]!==next[key]))changes.push({kind:'updated',before:{...item},after:{...next}});
     }
     for(const item of draft)if(!before.has(item.id))changes.push({kind:'added',after:{...item}});
     return changes;
   }
   function itinerarySignature(items,context={}){
-    return JSON.stringify({activities:items.map(item=>({id:item.id,type:item.type,start:item.start,end:item.end,locationId:item.locationId,venue:item.venue,status:item.status})),gate:context.gate,boardingTime:context.boardingTime,windowStart:context.windowStart});
+    return JSON.stringify({activities:items.map(item=>({id:item.id,type:item.type,start:item.start,end:item.end,startAt:item.startAt,endAt:item.endAt,locationId:item.locationId,venue:item.venue,status:item.status})),gate:context.gate,boardingTime:context.boardingTime,windowStart:context.windowStart,walkingMinutes:context.walkingMinutes,journey:context.journey?{revision:context.journey.revision,boardingAt:context.journey.boardingAt,boardingCutoffAt:context.journey.boardingCutoffAt,expectedLoungeArrivalAt:context.journey.expectedLoungeArrivalAt,estimatedDepartureAt:context.journey.estimatedDepartureAt,departureLoungeId:context.journey.departureLoungeId}:null});
   }
-  return {LOCATIONS,SERVICES,DEMO_AVAILABILITY,resolveServiceLocation,applyProposalToDraft,validateItinerary,diffItineraries,itinerarySignature};
+  return {LOCATIONS,SERVICES,DEMO_AVAILABILITY,travel,resolveServiceLocation,activityTimes,applyProposalToDraft,validateItinerary,diffItineraries,itinerarySignature};
 });
