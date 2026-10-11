@@ -42,3 +42,25 @@ node server.js
 地點資料來源：[寰宇堂頭等貴賓室](https://www.cathaypacific.com/cx/zh_TW/destinations/lounges/hong-kong-hkg/the-wing-first.html)、[玲瓏堂](https://www.cathaypacific.com/cx/zh_HK/destinations/lounges/hong-kong-hkg/the-deck.html)。預約資料要改為真實資訊，需接入預約系統提供的空位、候補序號與用戶預約接口；目前 `/api/availability` 僅返回示範資料。
 
 執行現有測試：使用 Node.js 執行 node --test。
+
+## 本機預約資料庫與候補模組
+
+新增的 SQLite 後端獨立於現有介面與 DeepSeek 行程提案。使用 **Node.js 24.15.0 或更高的 24.x 版本**及內建 `node:sqlite`，沒有 npm 依賴，無需 `npm install`。此版本的 `node:sqlite` 屬於 release candidate，用於本機比賽原型。
+
+```sh
+npm run db:init
+npm run reservations:server
+```
+
+預約 API 僅監聽 `http://127.0.0.1:4174`，資料庫保存在 `data/lounge-demo.sqlite`。再次初始化不會重置既有預約。貴賓室設施、會員資格、容量及時段均為虛構示範規則，不代表國泰真實規則。
+
+```sh
+npm test
+npm run demo:reservations
+```
+
+自動測試與端到端演示使用臨時資料庫。演示會實際修改本機資料庫：A 預約最後一個 18:40 按摩名額，B 候補，A 取消後系統向 B 發出邀請，B 接受後成為已確認預約；最後重新啟動獨立伺服器進程驗證資料保留。
+
+現有頁面仍由 `node server.js`（或 `npm start`）在 `http://127.0.0.1:8765/` 提供。**本階段尚未將預約 API 掛載至 `server.js`，也未更改前端或 Agent 行為**；`/api/availability`、候補畫面及 localStorage 中的預約標籤仍使用既有示範資料。4174 是獨立 JSON API，不是介面網址。
+
+參閱[安裝與 Windows 啟動](docs/reservations/README.md)、[資料庫結構與狀態](docs/reservations/schema.md)、[HTTP API](docs/reservations/api.md)、[現有前端與 Agent 整合指南](docs/reservations/integration.md)。
