@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { applyProposalToDraft, validateItinerary, diffItineraries } = require('../itinerary.js');
+const { applyProposalToDraft, validateItinerary, diffItineraries, resolveServiceLocation, SERVICES, DEMO_AVAILABILITY } = require('../itinerary.js');
 
 function fixture(){return [
   {id:1,type:'shower',start:'17:30',end:'18:00',venue:'寰宇堂頭等貴賓室',status:'added'},
@@ -60,4 +60,17 @@ test('changed confirmed reservation requires reconfirmation; removed booking is 
   assert.match(validateItinerary(moved,{originalActivities:original}).warnings[0],/重新確認/);
   const removed=applyProposalToDraft(original,[{op:'remove',id:3}]);
   assert.match(validateItinerary(removed,{originalActivities:original}).warnings[0],/不會自動取消/);
+});
+
+test('selects real lounge facilities and limits massage to supported lounges',()=>{
+  assert.equal(resolveServiceLocation('shower','bridge').venue,'逸連堂');
+  assert.equal(resolveServiceLocation('shower','bridge').area,'淋浴室');
+  assert.deepEqual(SERVICES.massage.locations,['wing','pier']);
+  const added=applyProposalToDraft(fixture(),[{op:'add',type:'rest',locationId:'pier',start:'18:35',end:'18:55'}]);
+  assert.equal(added.at(-1).venue,'玉衡堂頭等貴賓室');
+});
+
+test('demo availability only contains reservable shower and massage slots',()=>{
+  assert.deepEqual([...new Set(DEMO_AVAILABILITY.slots.map(slot=>slot.type))].sort(),['massage','shower']);
+  assert.ok(DEMO_AVAILABILITY.slots.every(slot=>slot.locationId));
 });

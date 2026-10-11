@@ -37,6 +37,7 @@ const PROPOSAL_TOOL = {
           op: { type: 'string', enum: ['add','update','remove'] },
           id: { type: 'integer', description: 'Existing activity id for update or remove.' },
           type: { type: 'string', enum: Object.keys(SERVICES) },
+          locationId: { type: 'string', enum: Object.keys(LOCATIONS), description: 'Selected Cathay lounge for add or update.' },
           start: { type: 'string', description: 'HH:MM start time for add or update.' },
           end: { type: 'string', description: 'HH:MM end time for add or update.' }
         }, required: ['op'] } },
@@ -72,7 +73,7 @@ function buildResponsePayload({ message, history, context }, model = 'deepseek-f
     loungeWindow: String(context?.windowStart || '17:30')+'–'+String(context?.windowEnd || '19:15'),
     boardingBufferMinutes: Number.isInteger(context?.boardingBuffer)?context.boardingBuffer:10
   };
-  const services=Object.entries(SERVICES).map(([type,service])=>({type,label:service.label,durationMinutes:service.duration,locationId:service.locationId,venue:service.venue,area:service.area,address:LOCATIONS[service.locationId]?.address||''}));
+  const services=Object.entries(SERVICES).map(([type,service])=>({type,label:service.label,durationMinutes:service.duration,defaultLocationId:service.locationId,availableLocations:(service.locations||[]).map(locationId=>({locationId,venue:LOCATIONS[locationId].name,area:LOCATIONS[locationId].areas[type],address:LOCATIONS[locationId].address})),reservationRequired:Boolean(service.reservationRequired)}));
   return {
     model,
     messages: [
@@ -103,7 +104,7 @@ function extractProposal(response,context){
     const parsed=JSON.parse(call.function.arguments);
     if(typeof parsed.explanation!=='string'||!parsed.explanation.trim()||!Array.isArray(parsed.operations))throw new Error('提案內容不完整。');
     const operations=parsed.operations.slice(0,13).map(operation=>({
-      op:operation.op,id:operation.id,type:operation.type,start:operation.start,end:operation.end
+      op:operation.op,id:operation.id,type:operation.type,locationId:operation.locationId,start:operation.start,end:operation.end
     }));
     const draft=applyProposalToDraft(context?.activities||[],operations);
     const checked=validateItinerary(draft,{...context,originalActivities:context?.activities||[]});
