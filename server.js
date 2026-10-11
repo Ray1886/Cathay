@@ -8,6 +8,8 @@ const {signature}=require('./recovery/flight-state');
 const {createSqliteRecoveryAdapter}=require('./recovery/sqlite-adapter');
 const {epoch}=require('./recovery/time');
 const {randomUUID}=require('node:crypto');
+const {createReservationApi}=require('./backend/reservation-api');
+const {createIntentValidator}=require('./backend/reservation-integration');
 
 const ROOT = __dirname;
 const DEEPSEEK_CHAT_URL = 'https://api.deepseek.com/chat/completions';
@@ -17,6 +19,8 @@ const FILES = {
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/itinerary.js': ['itinerary.js', 'text/javascript; charset=utf-8'],
   '/travel-time.js': ['travel-time.js', 'text/javascript; charset=utf-8'],
+  '/reservation-model.js': ['reservation-model.js', 'text/javascript; charset=utf-8'],
+  '/reservation-ui.js': ['reservation-ui.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
   '/assets/lounge-hero.png': ['assets/lounge-hero.png', 'image/png'],
   '/assets/lounge-scenes.png': ['assets/lounge-scenes.png', 'image/png']
@@ -24,9 +28,10 @@ const FILES = {
 const INSTRUCTIONS = [
   '你是高端航空貴賓室的智能行程助理，以自然、簡潔的繁體中文回答。',
   '根據提供的航班、登機口、時間與現有行程回答；計算時間時要準確。',
-  '這是概念原型，沒有真實航班、空位或預約系統。不可聲稱查到了即時資訊、完成了真實預約或已實際更改航班。',
+  '這是概念原型，航班和路線為模擬。本機 SQLite 預約已接入，但不是航空公司實際預約。只能根據提供的資料回答，不可編造空位或聲稱完成國泰真實預約。',
   '當旅客要求新增、取消、改時段或重新安排行程時，使用 propose_itinerary_change 工具產生明確操作。只修改旅客提及或為避免衝突必須調整的項目，保留其他活動。',
   '工具只是提出修改草案；旅客點擊「確認並保存」前不可聲稱行程已更改。不可聲稱真實預約已取消或確認。',
+  '預約、候補、接受邀請、取消或換約請引導旅客到「查看候補」的時段頁明確確認；行程草案工具不能提交資料庫預約。',
   '若要求不可行，請解釋時間衝突與可行替代；一般詢問只需對話，不呼叫工具。',
   '若資訊不足，說明需要哪些資訊。一般回覆控制在兩至四句，避免制式套話。'
 ].join('\n');
@@ -151,8 +156,10 @@ function sendJson(response, status, payload) {
 
 function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = process.env.DEEPSEEK_MODEL || 'deepseek-flash', fetchImpl = fetch, reservationService } = {}) {
   const previews=new Map();
+  const reservationApi=reservationService?createReservationApi({service:reservationService,beforeMutation:createIntentValidator(reservationService)}):null;
   return http.createServer(async (request, response) => {
     const url = new URL(request.url, 'http://localhost');
+    if(reservationApi&&await reservationApi(request,response))return;
     if(url.pathname==='/api/configure'||url.pathname.startsWith('/api/recovery')) {
       const socket=request.socket,host=request.headers.host;
       const origin=request.headers.origin;
@@ -214,7 +221,9 @@ function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = proces
       return;
     }
     if (url.pathname === '/api/availability' && request.method === 'GET') {
-      sendJson(response, 200, DEMO_AVAILABILITY);
+      if(!reservationService){sendJson(response,503,{error:'RESERVATIONS_UNAVAILABLE'});return;}
+      const slots=reservationService.listAvailableSlots({includeFull:true});
+      sendJson(response,200,{source:'sqlite-demo',slots,dates:[...new Set(slots.map(s=>s.service_date))]});
       return;
     }
     if (url.pathname === '/api/chat' && request.method === 'POST') {
@@ -276,8 +285,12 @@ if (require.main === module) {
   const {createReservationService}=require('./backend/reservation-service');
   const db=openDatabase({filename:DEFAULT_DATABASE_PATH});
   seedDatabase(db,{date:new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Hong_Kong',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())});
-  const server=createAppServer({reservationService:createReservationService({db})});
-  server.on('close',()=>db.close());
+  const reservationService=createReservationService({db});
+  const server=createAppServer({reservationService});
+  // Expire holds and promote the next waiter even when nobody performs a mutation.
+  const maintenance=setInterval(()=>{try{for(const slot of reservationService.listAvailableSlots({includeFull:true}))if(slot.reservation_mode!=='walk_in')reservationService.offerAvailableSlot(slot.slot_id);}catch(_){console.error('预约邀请维护失败，请检查本地数据库。');}},5000);
+  maintenance.unref();
+  server.on('close',()=>{clearInterval(maintenance);db.close();});
   server.on('error', error => {
     if(error.code==='EADDRINUSE')console.error('本機連接埠 '+port+' 已被使用。請先停止舊的服務，再重新啟動。');
     else console.error('本機服務無法啟動：'+error.message);

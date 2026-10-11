@@ -120,7 +120,7 @@ function checkBodyIdentity(body, userId) {
 }
 
 // This handler is deliberately separate from the existing chat server and UI.
-function createReservationApi({ service }) {
+function createReservationApi({ service, beforeMutation }) {
   if (!service) throw new TypeError('service is required.');
   return async function reservationApi(req, res) {
     let url;
@@ -196,7 +196,9 @@ function createReservationApi({ service }) {
           queryObject(url, []);
           const body = await readBody(req);
           const fields = action === 'book' ? ['slotId', 'idempotencyKey', 'userId'] : action === 'replace' ? ['newSlotId', 'idempotencyKey', 'userId'] : action === 'join' ? ['slotId', 'userId'] : ['userId'];
+          if(beforeMutation)fields.push('context');
           allowedObject(body, fields); checkBodyIdentity(body, userId);
+          if(beforeMutation)beforeMutation({action,body,userId,recordId:route[2]===undefined?undefined:positiveId(route[2],'recordId')});
           if (action === 'book') {
             data = service.createReservation(userId, bodyId(body.slotId, 'slotId'), requestKey(req, body)); status = data.replayed ? 200 : 201;
           } else if (action === 'replace') data = service.replaceReservation(positiveId(route[2], 'reservationId'), userId, bodyId(body.newSlotId, 'newSlotId'), requestKey(req, body));

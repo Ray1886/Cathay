@@ -1,5 +1,7 @@
 # Integrating the reservation backend
 
+> 更新：主项目已完成时段预约界面整合。当前实现见 [frontend.md](frontend.md)。以下内容保留为独立后端阶段的迁移设计，里面“尚未挂载”“静态候补”等描述不再代表最新主项目状态。
+
 ## Current repository
 
 `index.html` loads `itinerary.js` and `app.js` as classic browser scripts. `itinerary.js` exposes `ItineraryEngine` in the browser and CommonJS exports in Node. `app.js` exports `parseTypes`, `planActivities`, and `voiceErrorMessage` for Node tests. `server.js` uses native HTTP and CommonJS, with DeepSeek chat/tool-call handling. The new backend follows CommonJS; changing the root package to `"type": "module"` would break existing `require()` calls and needs a coordinated migration.
