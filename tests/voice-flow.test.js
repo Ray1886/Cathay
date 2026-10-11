@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const engine = require('../itinerary.js');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
 
@@ -22,11 +23,11 @@ function loadPage(Recognition) {
     querySelectorAll() { return []; }
   };
   const window = { isSecureContext: true, SpeechRecognition: Recognition };
-  vm.runInNewContext(source, { document, window, localStorage: { getItem: () => null, setItem() {} }, setTimeout() {}, clearTimeout() {} });
+  vm.runInNewContext(source, { document, window, ItineraryEngine:engine, localStorage: { getItem: () => null, setItem() {} }, setTimeout() {}, clearTimeout() {} });
   return (selector) => document.querySelector(selector);
 }
 
-test('spoken simplified meal request appears in the itinerary', () => {
+test('spoken simplified meal request fills the composer without changing the itinerary', () => {
   class FakeRecognition {
     start() {
       this.onstart();
@@ -35,11 +36,12 @@ test('spoken simplified meal request appears in the itinerary', () => {
     }
   }
   const element = loadPage(FakeRecognition);
+  const before = element('#activityList').innerHTML;
   element('#speechLang').value = 'zh-CN';
   element('#micButton').listeners.click();
   assert.match(element('#requestInput').value, /吃饭/);
-  assert.match(element('#activityList').innerHTML, /晚餐/);
-  assert.match(element('#voiceStatus').textContent, /行程已更新/);
+  assert.equal(element('#activityList').innerHTML, before);
+  assert.match(element('#voiceStatus').textContent, /請按發送/);
 });
 
 test('unsupported voice engine gives an actionable fallback', () => {

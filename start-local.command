@@ -2,6 +2,14 @@
 set -eu
 cd -- "$(dirname -- "$0")"
 
+if command -v lsof >/dev/null 2>&1; then
+  occupied_pid="$(lsof -tiTCP:8765 -sTCP:LISTEN 2>/dev/null || true)"
+  if [[ -n "$occupied_pid" ]]; then
+    print -u2 "本機 8765 連接埠已有服務（PID: $occupied_pid）。請先在舊終端按 Control+C，或確認程序後執行 kill $occupied_pid，再重新開啟此腳本。"
+    exit 1
+  fi
+fi
+
 node_bin="$(command -v node || true)"
 if [[ -z "$node_bin" ]]; then
   bundled_node="/Users/ray/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"

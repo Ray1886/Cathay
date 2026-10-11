@@ -2,6 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
+const { applyProposalToDraft, validateItinerary, SERVICES, LOCATIONS, DEMO_AVAILABILITY } = require('./itinerary.js');
 
 const ROOT = __dirname;
 const DEEPSEEK_CHAT_URL = 'https://api.deepseek.com/chat/completions';
@@ -9,6 +10,7 @@ const FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
+  '/itinerary.js': ['itinerary.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
   '/assets/lounge-hero.png': ['assets/lounge-hero.png', 'image/png'],
   '/assets/lounge-scenes.png': ['assets/lounge-scenes.png', 'image/png']
@@ -17,9 +19,33 @@ const INSTRUCTIONS = [
   '你是高端航空貴賓室的智能行程助理，以自然、簡潔的繁體中文回答。',
   '根據提供的航班、登機口、時間與現有行程回答；計算時間時要準確。',
   '這是概念原型，沒有真實航班、空位或預約系統。不可聲稱查到了即時資訊、完成了真實預約或已實際更改航班。',
-  '如果旅客要求調整，提出具體可行的時段與取捨；只有介面中的確認或編輯操作會更新原型行程。',
+  '當旅客要求新增、取消、改時段或重新安排行程時，使用 propose_itinerary_change 工具產生明確操作。只修改旅客提及或為避免衝突必須調整的項目，保留其他活動。',
+  '工具只是提出修改草案；旅客點擊「確認並保存」前不可聲稱行程已更改。不可聲稱真實預約已取消或確認。',
+  '若要求不可行，請解釋時間衝突與可行替代；一般詢問只需對話，不呼叫工具。',
   '若資訊不足，說明需要哪些資訊。一般回覆控制在兩至四句，避免制式套話。'
 ].join('\n');
+const PROPOSAL_TOOL = {
+  type: 'function',
+  function: {
+    name: 'propose_itinerary_change',
+    description: 'Propose add, update, or remove operations for the local itinerary. The client previews and validates the draft before any change is applied.',
+    parameters: {
+      type: 'object',
+      properties: {
+        explanation: { type: 'string', description: 'Short Traditional Chinese explanation of the proposed changes.' },
+        operations: { type: 'array', items: { type: 'object', properties: {
+          op: { type: 'string', enum: ['add','update','remove'] },
+          id: { type: 'integer', description: 'Existing activity id for update or remove.' },
+          type: { type: 'string', enum: Object.keys(SERVICES) },
+          start: { type: 'string', description: 'HH:MM start time for add or update.' },
+          end: { type: 'string', description: 'HH:MM end time for add or update.' }
+        }, required: ['op'] } },
+        warnings: { type: 'array', items: { type: 'string' } }
+      },
+      required: ['explanation','operations']
+    }
+  }
+};
 
 function cleanHistory(history) {
   if (!Array.isArray(history)) return [];
@@ -29,23 +55,36 @@ function cleanHistory(history) {
 
 function buildResponsePayload({ message, history, context }, model = 'deepseek-flash') {
   const itinerary = Array.isArray(context?.activities) ? context.activities.slice(0, 12).map(item => ({
+    id: Number.isInteger(item.id) ? item.id : null,
+    type: String(item.type || '').slice(0, 20),
     activity: String(item.label || '').slice(0, 40),
     start: String(item.start || '').slice(0, 8),
     end: String(item.end || '').slice(0, 8),
     status: String(item.status || '').slice(0, 20),
+    locationId: String(item.locationId || '').slice(0, 20),
     venue: String(item.venue || '').slice(0, 80)
   })) : [];
-  const flight = { number: 'CX251', destination: '倫敦希斯路', boarding: '19:20', gate: String(context?.gate || '25').slice(0, 8), loungeWindow: '17:30–19:15' };
+  const flight = {
+    number: String(context?.flightNumber || 'CX251').slice(0, 16),
+    destination: '倫敦希斯路',
+    boardingTime: String(context?.boardingTime || '19:20').slice(0, 8),
+    gate: String(context?.gate || '25').slice(0, 8),
+    loungeWindow: String(context?.windowStart || '17:30')+'–'+String(context?.windowEnd || '19:15'),
+    boardingBufferMinutes: Number.isInteger(context?.boardingBuffer)?context.boardingBuffer:10
+  };
+  const services=Object.entries(SERVICES).map(([type,service])=>({type,label:service.label,durationMinutes:service.duration,locationId:service.locationId,venue:service.venue,area:service.area,address:LOCATIONS[service.locationId]?.address||''}));
   return {
     model,
     messages: [
       { role: 'system', content: INSTRUCTIONS },
-      { role: 'user', content: '目前行程資料：' + JSON.stringify({ flight, itinerary }) },
+      { role: 'user', content: '目前行程與限制：' + JSON.stringify({ flight, itinerary, services }) },
       ...cleanHistory(history),
       { role: 'user', content: message }
     ],
     thinking: { type: 'enabled' },
     reasoning_effort: 'low',
+    tools: [PROPOSAL_TOOL],
+    tool_choice: 'auto',
     stream: false,
     max_tokens: 4096
   };
@@ -54,6 +93,24 @@ function buildResponsePayload({ message, history, context }, model = 'deepseek-f
 function extractOutputText(response) {
   return typeof response?.choices?.[0]?.message?.content === 'string'
     ? response.choices[0].message.content.trim() : '';
+}
+
+function extractProposal(response,context){
+  const calls=response?.choices?.[0]?.message?.tool_calls;
+  const call=Array.isArray(calls)?calls.find(item=>item?.function?.name==='propose_itinerary_change'):null;
+  if(!call)return null;
+  try{
+    const parsed=JSON.parse(call.function.arguments);
+    if(typeof parsed.explanation!=='string'||!parsed.explanation.trim()||!Array.isArray(parsed.operations))throw new Error('提案內容不完整。');
+    const operations=parsed.operations.slice(0,13).map(operation=>({
+      op:operation.op,id:operation.id,type:operation.type,start:operation.start,end:operation.end
+    }));
+    const draft=applyProposalToDraft(context?.activities||[],operations);
+    const checked=validateItinerary(draft,{...context,originalActivities:context?.activities||[]});
+    if(!checked.valid)return {error:checked.errors.join(' ')};
+    return {type:'itinerary_proposal',explanation:parsed.explanation.trim().slice(0,800),operations,
+      warnings:[...new Set([...(Array.isArray(parsed.warnings)?parsed.warnings.filter(value=>typeof value==='string').map(value=>value.slice(0,200)):[]),...checked.warnings])].slice(0,8)};
+  }catch(error){return {error:error.message||'提案格式無效。'}}
 }
 
 async function readJson(request) {
@@ -86,6 +143,10 @@ function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = proces
       sendJson(response, 200, { mode: apiKey ? 'live' : 'demo', provider: 'deepseek', model: apiKey ? model : null });
       return;
     }
+    if (url.pathname === '/api/availability' && request.method === 'GET') {
+      sendJson(response, 200, DEMO_AVAILABILITY);
+      return;
+    }
     if (url.pathname === '/api/chat' && request.method === 'POST') {
       if (!apiKey) { sendJson(response, 503, { error: 'AI_NOT_CONFIGURED' }); return; }
       try {
@@ -107,9 +168,16 @@ function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = proces
           sendJson(response, 502, { error });
           return;
         }
-        const answer = extractOutputText(await upstream.json());
+        const completion = await upstream.json();
+        const proposal=extractProposal(completion,body.context);
+        if(proposal){
+          if(proposal.error)sendJson(response,200,{type:'chat',reply:'目前無法安全套用這項修改：'+proposal.error+' 請調整時間或需求後再試。'});
+          else sendJson(response,200,proposal);
+          return;
+        }
+        const answer = extractOutputText(completion);
         if (!answer) { sendJson(response, 502, { error: 'EMPTY_AI_RESPONSE' }); return; }
-        sendJson(response, 200, { reply: answer });
+        sendJson(response, 200, { type:'chat',reply: answer });
       } catch (error) {
         if (error.status) sendJson(response, error.status, { error: error.message });
         else { console.error('AI request failed:', error.name); sendJson(response, 502, { error: 'AI_UNAVAILABLE' }); }
@@ -133,7 +201,13 @@ function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = proces
 
 if (require.main === module) {
   const port = Number(process.env.PORT || 8765);
-  createAppServer().listen(port, '127.0.0.1', () => {
+  const server=createAppServer();
+  server.on('error', error => {
+    if(error.code==='EADDRINUSE')console.error('本機連接埠 '+port+' 已被使用。請先停止舊的服務，再重新啟動。');
+    else console.error('本機服務無法啟動：'+error.message);
+    process.exitCode=1;
+  });
+  server.listen(port, '127.0.0.1', () => {
     const pageUrl = 'http://127.0.0.1:' + port + '/';
     console.log('貴賓室原型已啟動：' + pageUrl);
     console.log(process.env.DEEPSEEK_API_KEY ? '模式：DeepSeek AI' : '模式：演示（未設定 DEEPSEEK_API_KEY）');
@@ -146,4 +220,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { createAppServer, buildResponsePayload, extractOutputText, cleanHistory };
+module.exports = { createAppServer, buildResponsePayload, extractOutputText, extractProposal, cleanHistory };
