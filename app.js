@@ -32,6 +32,7 @@ let boardingTime = typeof document === 'undefined' ? '19:20' : readBoardingTime(
 let gate = typeof document === 'undefined' ? '25' : readGate();
 let recoveryJourney=typeof document==='undefined'?null:readJourney();
 let recoveryBusy=false,recoveryRisk='';
+let bookingUI=null;
 if(recoveryJourney){arrivalTime=recoveryJourney.expectedLoungeArrivalAt.slice(11,16);boardingTime=recoveryJourney.boardingAt.slice(11,16);gate=recoveryJourney.gate;}
 let nextId = Math.max(0,...activities.map(a=>a.id)) + 1;
 let editingId = null;
@@ -46,7 +47,7 @@ const hongKongTime=()=>new Intl.DateTimeFormat('zh-HK',{timeZone:'Asia/Hong_Kong
 let messages = [
   { role:'user', text:'我想先洗澡，再吃點東西，如果可以也幫我安排按摩。', time:hongKongTime() },
   { role:'agent', text:'好的，我會為您安排淋浴、晚餐，並視乎可用性為您預約按摩。', time:hongKongTime() },
-  { role:'agent', kind:'plan', text:'已為您安排以下行程；按摩目前候補中，我會持續留意空位。', time:hongKongTime() },
+  { role:'agent', kind:'plan', text:'以下是已规划行程；预约和候补请在时段页选择并确认，状态以数据库记录为准。', time:hongKongTime() },
   { role:'user', text:'這樣來得及登機嗎？', time:hongKongTime() },
   { role:'agent', text:'來得及。系統會按登機時間保留 10 分鐘緩衝並顯示最晚離開貴賓室的建議。', time:hongKongTime() },
   { role:'agent', kind:'opportunity', time:hongKongTime() }
@@ -156,7 +157,7 @@ function locationLine(itemOrType,locationId){
 }
 function statusMarkup(item){
   if(item.type==='gate')return '';
-  const labels={pending:'候補中',confirmed:'已確認',added:'已添加',none:'已添加'};
+  const labels={pending:item.waitlistEntryId?({waiting:'排队中',offered:'获邀待接受',expired:'邀请已过期',cancelled:'已退出候补'}[item.bookingState]||'待预约／需确认'):'待预约／需确认',confirmed:item.reservationId?'已预约':'示范已确认',added:'已添加',none:'已添加'};
   return '<span class="status '+esc(item.status)+'">'+(item.status==='pending'?icon('clock'):icon('check'))+esc(labels[item.status]||'已添加')+'</span>';
 }
 function render(){
@@ -183,7 +184,7 @@ function render(){
   const recommendation=$('#boardingRecommendation');
   if(recommendation)recommendation.textContent='建議最晚 '+departure+' 離開 '+(ENGINE.LOCATIONS[lastLoungeLocation()]?.shortName||'貴賓室')+'，'+latestGateArrival()+' 前抵達登機口';
   const pendingCount=activities.filter(a=>a.status==='pending').length;
-  $('#remainingText').textContent=recoveryRisk?'最新约束下行程存在冲突，请查看恢复建议':pendingCount?pendingCount+' 項服務正在候補':'行程已準備就緒';
+  $('#remainingText').textContent=recoveryRisk?'最新约束下行程存在冲突，请查看恢复建议':pendingCount?pendingCount+' 项服务待预约／需确认':'行程已準備就緒';
   const bookingNotice=$('#bookingNotice');
   bookingNotice.hidden=!bookingAlerts.length;
   bookingNotice.textContent=bookingAlerts.length?'預約提醒：'+bookingAlerts.at(-1):'';
@@ -197,11 +198,11 @@ function render(){
 function renderServices(){
   const entries=['shower','dining','massage','rest'];
   $('#serviceList').innerHTML=entries.map(type=>{
-    const data=TYPES[type], massage=type==='massage'?activities.find(a=>a.type==='massage'):null;
-    const confirmed=massage?.status==='confirmed', pending=massage?.status==='pending';
-    const label=confirmed?'已安排':pending?'候補中':type==='massage'?'可候補':'可添加';
-    const displayedSlots=data.slots.filter(time=>minutes(time)>=minutes(arrivalTime));
-    return '<article class="service-card"><div class="service-photo '+type+'"><span class="service-tag '+(pending?'wait':'')+'">'+label+'</span></div><div class="service-body"><div class="service-name">'+icon(data.icon)+esc(data.label)+'</div><p>'+esc(data.locations.map(id=>ENGINE.LOCATIONS[id].shortName).join('、'))+'可選</p><div class="time-options">'+(displayedSlots.length?displayedSlots.map(t=>'<span>'+t+'</span>').join(''):'<span>可自訂時間</span>')+'</div><button type="button" data-service="'+type+'">'+(confirmed?'查看行程':pending?'查看候補':data.reservationRequired?'選擇預約':'添加至行程')+'</button></div></article>';
+    const data=TYPES[type], selected=activities.find(a=>a.type===type);
+    const confirmed=selected?.status==='confirmed'&&Boolean(selected.reservationId), pending=Boolean(selected?.waitlistEntryId)&&['waiting','offered'].includes(selected.bookingState);
+    const label=confirmed?'已预约':pending?selected.bookingState==='offered'?'获邀待接受':'排队中':data.reservationRequired?'待预约':'可添加';
+    const displayedSlots=data.reservationRequired?(bookingUI?.get().slots||[]).filter(s=>s.service_code===type&&s.service_date===globalThis.ReservationModel?.tripDate(currentContext())).map(s=>s.start_time):data.slots.filter(time=>minutes(time)>=minutes(arrivalTime));
+    return '<article class="service-card"><div class="service-photo '+type+'"><span class="service-tag '+(pending?'wait':'')+'">'+label+'</span></div><div class="service-body"><div class="service-name">'+icon(data.icon)+esc(data.label)+'</div><p>'+esc(data.locations.map(id=>ENGINE.LOCATIONS[id].shortName).join('、'))+'可選</p><div class="time-options">'+(displayedSlots.length?[...new Set(displayedSlots)].map(t=>'<span>'+t+'</span>').join(''):data.reservationRequired?'<span>查询数据库时段</span>':'<span>可自訂時間</span>')+'</div><button type="button" data-service="'+type+'">'+(confirmed?'管理预约':pending?'查看候補':data.reservationRequired?'選擇預約':'添加至行程')+'</button></div></article>';
   }).join('');
 }
 function renderChat(){
@@ -213,7 +214,7 @@ function renderChat(){
     if(m.kind==='opportunity'){
       const massage=activities.find(a=>a.type==='massage');
       if(!massage)content='<div class="message-title">'+icon('check')+'按摩時段已從示範行程移除</div><p>需要時可從「可添加行程」重新選擇。</p>';
-      else content='<div class="opportunity-inner"><div class="opportunity-photo"></div><div class="opportunity-copy"><strong>✦ 按摩候補進度</strong><p>查看示範空位與排隊名次；實際預約資料尚未連接。</p><div class="opportunity-actions">'+(massage.status==='confirmed'?'<span class="status confirmed">'+icon('check')+'已確認</span>':'<button data-chat="availability">查看候補詳情</button>')+'</div></div></div>';
+      else content='<div class="opportunity-inner"><div class="opportunity-photo"></div><div class="opportunity-copy"><strong>✦ 预约与候补进度</strong><p>查询本机数据库时段、排队名次和限时邀请。</p><div class="opportunity-actions"><button data-chat="availability">查看预约与候补</button></div></div></div>';
     }
     if(m.kind==='gate') content='<div class="message-title">'+icon('plane')+'模擬登機口 G'+esc(gate)+'</div><p>請檢查最新步行約束與恢復草案，確認前原行程保持不變。</p>';
     if(m.kind==='updated') content='<div class="message-title">'+icon('check')+'行程時間已更新</div><p>請按最新登機口與候機時間檢查行程；服務預約狀態仍以實際預約系統為準。</p>';
@@ -283,27 +284,17 @@ function showBoardingSheet(){
   const selected=lastLoungeLocation();
   showSheet('修改登機時間','<form id="boardingForm"><label class="field">登機時間<input id="boardingInput" type="time" value="'+esc(boardingTime)+'" required></label><div id="boardingSuggestion" class="location-card"><small>系統安全建議</small><strong>最晚 '+esc(latestGateArrival())+' 抵達登機口</strong><span>從 '+esc(ENGINE.LOCATIONS[selected].shortName)+' 出發，建議最晚 '+esc(latestLoungeDeparture(selected))+' 離開；步行時間為虛構示範。</span></div><p class="sheet-note">這會產生模擬航空事件，檢查影響並預覽恢復草案；確認後才修改行程。跨午夜請使用「突發修改」的完整日期。</p><p id="boardingError" class="sheet-error" role="alert"></p><button class="sheet-primary" type="submit">檢查新的登機時間</button></form>','航班時間');
 }
-function waitlistContent(data){
-  const slots=Array.isArray(data?.slots)?data.slots:[];
-  const reservationTypes=['shower','massage'];
-  const pending=activities.filter(item=>item.status==='pending'&&reservationTypes.includes(item.type));
-  const queue=pending.length?pending.map(item=>{
-    const slot=slots.find(value=>value.type===item.type&&value.locationId===item.locationId&&value.start===item.start);
-    const rank=slot&&Number.isInteger(slot.queue)?'示範排隊第 '+slot.queue+' 名':'此時段暫無排隊樣本';
-    const open=slot&&Number.isInteger(slot.available)?' · 示範空位 '+slot.available+' 個':'';
-    return '<div class="waitlist-row"><strong>'+esc(item.start)+' '+esc(TYPES[item.type].label)+'</strong><span>'+esc(locationLine(item))+'</span><b>'+esc(rank+open)+'</b></div>';
-  }).join(''):'<p class="sheet-note">目前行程沒有候補活動。</p>';
-  const openSlots=slots.filter(slot=>reservationTypes.includes(slot.type)&&typeof slot.start==='string'&&Number.isInteger(slot.available)&&slot.available>0&&minutes(slot.start)>=minutes(arrivalTime));
-  const available=openSlots.length?openSlots.map(slot=>'<div class="waitlist-row"><strong>'+esc(slot.start)+' '+esc(TYPES[slot.type].label)+'</strong><span>'+esc(locationLine(slot.type,slot.locationId))+'</span><b>示範空位 '+slot.available+' 個</b></div>').join(''):'<p class="sheet-note">目前樣本中沒有可顯示的空位。</p>';
-  return '<p class="sheet-note">示範預約資料｜只顯示需要預約的淋浴與按摩。空位和名次不能用於實際預約。</p><h3 class="waitlist-heading">我的候補</h3>'+queue+'<h3 class="waitlist-heading">淋浴／按摩空位</h3>'+available;
+async function showWaitlist(type=''){
+  showSheet('时段预约与候补','<p class="sheet-note">正在查询数据库…</p>','预约管理');
+  if(!bookingUI){$('#sheetBody').innerHTML='<p class="sheet-error">请通过本地 Node.js 服务打开页面，预约模块未加载。</p>';return;}
+  await bookingUI.open(type);
 }
-async function showWaitlist(){
-  showSheet('空位與候補進度','<p class="sheet-note">正在讀取示範預約資料…</p>','候補管理');
-  let data=ENGINE.DEMO_AVAILABILITY;
-  if(typeof location!=='undefined'&&location.protocol!=='file:'){
-    try{const response=await fetch('./api/availability');if(response.ok)data=await response.json()}catch(_){}
-  }
-  if($('#sheet').open)$('#sheetBody').innerHTML=waitlistContent(data);
+function initBookings(){
+  if(!globalThis.ReservationUI)return;
+  bookingUI=globalThis.ReservationUI.createController({context:()=>({...currentContext(),serviceDate:globalThis.ReservationModel.tripDate(currentContext())}),show:html=>{if($('#sheet').open)$('#sheetBody').innerHTML=html;},update:next=>{activities=next;nextId=Math.max(nextId,...next.map(a=>a.id+1));if(recoveryJourney)recoveryJourney={...recoveryJourney,currentItinerary:next.map(a=>({...a}))};save();render();renderChat();},notify:toast});
+  bookingUI.load();
+  setInterval(()=>{if($('#sheet').open)bookingUI.tick();},5000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)bookingUI.load();});
 }
 function stageProposal(payload){
   if(!ENGINE){addMessage('agent','行程驗證模組尚未載入，請重新整理頁面。');return false}
@@ -371,7 +362,7 @@ function generatePlan(text){
 }
 function currentContext(){
   return {...proposalPolicy(),originalActivities:undefined,flightNumber:'CX251',
-    activities:sorted().map(a=>({id:a.id,type:a.type,label:TYPES[a.type].label,start:a.start,end:a.end,...(a.startAt?{startAt:a.startAt,endAt:a.endAt}:{}),status:a.status,locationId:a.locationId,venue:a.venue,area:a.area||ENGINE.resolveServiceLocation(a.type,a.locationId).area,reservationId:a.reservationId,loungeServiceId:a.loungeServiceId}))};
+    activities:sorted().map(a=>({id:a.id,type:a.type,label:TYPES[a.type].label,start:a.start,end:a.end,...(a.startAt?{startAt:a.startAt,endAt:a.endAt}:{}),status:a.status,locationId:a.locationId,venue:a.venue,area:a.area||ENGINE.resolveServiceLocation(a.type,a.locationId).area,reservationId:a.reservationId,slotId:a.slotId,waitlistEntryId:a.waitlistEntryId,bookingState:a.bookingState,loungeServiceId:a.loungeServiceId}))};
 }
 async function checkAgentMode(){
   if(typeof location==='undefined')return;
@@ -423,7 +414,7 @@ async function sendMessage(){
     if(expected){const day=recoveryJourney?.plannedLoungeArrivalAt.slice(0,10)||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Hong_Kong',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());await runRecovery('late',0,day+'T'+expected[0]+':00+08:00');return;}
     addMessage('agent','請提供晚到分鐘數，例如「我會晚到 20 分鐘」，或在「突發修改」輸入完整預計到達時間。');return;
   }
-  if(/確認.{0,8}按摩|按摩.{0,8}確認/.test(text)){addMessage('agent','目前沒有連接實際預約系統。您可以在「查看候補」查看示範空位與排隊名次。');showWaitlist();return}
+  if(/確認.{0,8}按摩|按摩.{0,8}確認/.test(text)){addMessage('agent','请在数据库时段页选择预约或接受邀请；最终确认后才写入本机预约。');showWaitlist('massage');return}
   if(aiMode!=='live'){demoReply(text);return}
   sending=true; $('#sendButton').disabled=true; input.disabled=true;
   const pending={role:'agent',text:'正在根據您的行程整理建議…',kind:'thinking',time:nowTime()};
@@ -551,15 +542,16 @@ if(typeof document!=='undefined'){
   $('#micButton').addEventListener('click',startVoice);
   $('#changeArrival').addEventListener('click',showArrivalSheet);
   $('#changeBoarding').addEventListener('click',showBoardingSheet);
-  $('#closeSheet').addEventListener('click',closeSheet);
+  $('#closeSheet').addEventListener('click',()=>{bookingUI?.close();closeSheet();});
+  $('#sheet').addEventListener('close',()=>{if(!$('#sheet').open)bookingUI?.close();});
   $('#activityList').addEventListener('click',e=>{
     const edit=e.target.closest('button.edit'), del=e.target.closest('button.delete'), move=e.target.closest('[data-move]');
     if(edit)openEdit(activities.find(a=>a.id===Number(edit.dataset.id)));
-    if(del){activities=activities.filter(a=>a.id!==Number(del.dataset.id));render();renderChat();save();toast('活動已從行程移除。')}
+    if(del){const item=activities.find(a=>a.id===Number(del.dataset.id));if(item?.reservationId&&bookingUI?.get().reservations.some(r=>r.id===item.reservationId&&r.status==='confirmed')||item?.waitlistEntryId&&bookingUI?.get().waitlist.some(w=>w.id===item.waitlistEntryId&&['waiting','offered'].includes(w.status))){showWaitlist();toast('请先确认取消数据库预约或退出候补，再移除活动。');return;}activities=activities.filter(a=>a.id!==Number(del.dataset.id));render();renderChat();save();toast('活動已從行程移除。')}
     if(move)reorder(Number(move.dataset.id),move.dataset.move);
   });
   $('#reorderButton').addEventListener('click',()=>{reorderMode=!reorderMode;render();$('#reorderButton').innerHTML=icon('arrows')+(reorderMode?' 完成排序':' 重新排序')});
-  $('#serviceList').addEventListener('click',e=>{const b=e.target.closest('[data-service]');if(!b)return; if(b.dataset.service==='massage'){const item=activities.find(a=>a.type==='massage');if(item?.status==='confirmed'){$('#activityList').scrollIntoView({behavior:'smooth',block:'center'});return}if(!item){openEdit(null,'massage');return}showWaitlist()}else openEdit(null,b.dataset.service)});
+  $('#serviceList').addEventListener('click',e=>{const b=e.target.closest('[data-service]');if(!b)return;if(TYPES[b.dataset.service].reservationRequired)showWaitlist(b.dataset.service);else openEdit(null,b.dataset.service)});
   $('#changeTime').addEventListener('click',()=>showSheet('修改時間','<p class="sheet-note">可修改到達時間、登機時間或每項活動。系統會重新計算最晚離開貴賓室的建議。</p><button class="sheet-choice" data-arrival="open"><strong>到達貴賓室　'+esc(arrivalTime)+'</strong><small>修改候機時段起點</small></button><button class="sheet-choice" data-boarding="open"><strong>登機時間　'+esc(boardingTime)+'</strong><small>查看並套用最晚抵達登機口建議</small></button>'+sorted().map(a=>'<button class="sheet-choice" data-edit-id="'+a.id+'"><strong>'+esc(a.start)+' – '+esc(a.end)+'　'+esc(TYPES[a.type].label)+'</strong><small>'+esc(locationLine(a))+'</small></button>').join('')));
   $('#savePlan').addEventListener('click',()=>{save();recordPreferenceSnapshot();toast('行程已保存在此裝置。')});
   $('#viewWaitlist').addEventListener('click',showWaitlist);
@@ -584,6 +576,7 @@ if(typeof document!=='undefined'){
     }
   }));
   $('#sheetBody').addEventListener('click',e=>{
+    const booking=e.target.closest('[data-booking]');if(booking){bookingUI?.action(booking.dataset.booking,Number(booking.dataset.record));return;}
     const edit=e.target.closest('[data-edit-id]'),add=e.target.closest('[data-add-type]'),action=e.target.closest('[data-sheet]'),incident=e.target.closest('[data-incident]'),arrival=e.target.closest('[data-arrival]'),boarding=e.target.closest('[data-boarding]');
     if(arrival){closeSheet();showArrivalSheet()}
     if(boarding){closeSheet();showBoardingSheet()}
@@ -592,6 +585,7 @@ if(typeof document!=='undefined'){
     if(action){closeSheet();showScreen('agent')}
   });
   $('#sheetBody').addEventListener('change',e=>{
+    if(e.target.dataset.bookingFilter){bookingUI?.filter(e.target.dataset.bookingFilter,e.target.value);return;}
     if(e.target.id==='incidentType'){const options={late:['20','晚到分鐘數'],gate:['65','新的登機口'],delay:['30','起飛延誤分鐘數'],boarding:[boardingTime,'新的登機時間（HH:MM）']};const selected=options[e.target.value];$('#incidentValue').value=selected[0];$('#incidentValueLabel').textContent=selected[1];$('#incidentAt').value='';$('#incidentAt').disabled=!['late','boarding'].includes(e.target.value);$('#incidentHint').textContent=e.target.value==='delay'?'起飛延誤不會自動延後登機時間。':e.target.value==='gate'?'步行時間來自虚構路线表；未知登機口不會猜測距離。':'跨午夜可填完整日期；所有修改仍需確認。';}
     if(e.target.id==='activityType')$('#activityLocation').innerHTML=locationPicker(e.target.value,TYPES[e.target.value].locationId);
     if(e.target.id==='activityLounge')$('#locationDetails').innerHTML=locationCard($('#activityType').value,e.target.value);
@@ -625,12 +619,12 @@ if(typeof document!=='undefined'){
     const type=$('#activityType').value;
     const previous=activities.find(a=>a.id===editingId);
     const locationId=type==='gate'?'gate':$('#activityLounge').value;
-    const candidate={id:editingId??nextId,type,start:$('#activityStart').value,end:$('#activityEnd').value,...ENGINE.resolveServiceLocation(type,locationId),status:type==='gate'?'none':TYPES[type].reservationRequired?'pending':'added'};
+    const candidate={...(previous?{reservationId:previous.reservationId,waitlistEntryId:previous.waitlistEntryId,slotId:previous.slotId,bookingState:previous.bookingState}:{}),id:editingId??nextId,type,start:$('#activityStart').value,end:$('#activityEnd').value,...ENGINE.resolveServiceLocation(type,locationId),status:type==='gate'?'none':TYPES[type].reservationRequired?'pending':'added'};
     if(previous)candidate.status=previous.type===type&&previous.start===candidate.start&&previous.end===candidate.end&&previous.locationId===candidate.locationId?previous.status:previous.status==='confirmed'?'pending':candidate.status;
     const err=validate(candidate);if(err){$('#sheetError').textContent=err;return}
     if(editingId)activities=activities.map(a=>a.id===editingId?candidate:a);else{activities.push(candidate);nextId++}
     closeSheet();render();toast(editingId?'行程已更新。':'活動已加入行程。');
   });
-  setupVoice();render();renderChat();checkAgentMode();
+  setupVoice();render();renderChat();checkAgentMode();initBookings();
 }
 if(typeof module!=='undefined')module.exports={parseTypes,planActivities,voiceErrorMessage};

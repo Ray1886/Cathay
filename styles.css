@@ -280,3 +280,29 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Database-backed reservation panel from upstream, using the shared visual tokens. */
+.booking-panel { overflow-wrap: anywhere; }
+.booking-panel h3 { margin: 24px 0 8px; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.booking-panel > h3:first-child { margin-top: 0; }
+.booking-panel > p { font-size: 13px; line-height: 1.7; }
+.booking-panel > .sheet-error:empty { display: none; }
+.booking-row { display: flex; flex-direction: column; gap: 8px; padding: 16px 0; margin: 0; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); }
+.booking-row strong { font-size: 14px; font-weight: 500; line-height: 1.6; }
+.booking-row span { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.booking-row small { color: var(--warning); font-size: 12px; line-height: 1.6; }
+.booking-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.booking-panel button { min-height: 44px; max-width: 100%; border: 1px solid #9fbfba; border-radius: var(--radius); padding: 10px 12px; background: var(--surface); color: var(--accent); font: inherit; font-size: 13px; line-height: 1.5; font-weight: 500; }
+.booking-panel button:disabled { opacity: .55; cursor: default; }
+.booking-actions button:last-child { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.booking-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.booking-filters .field { min-width: 0; margin: 0; }
+.booking-filters .field:last-child { grid-column: 1 / -1; }
+.booking-filters select { width: 100%; max-width: 100%; min-width: 0; }
+@media (hover: hover) {
+  .booking-panel button:hover:not(:disabled) { background: var(--soft); }
+  .booking-actions button:last-child:hover:not(:disabled) { background: var(--accent-hover); }
+}
+@media (max-width: 359px) {
+  .booking-filters { grid-template-columns: 1fr; }
+}

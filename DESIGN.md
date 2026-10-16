@@ -11,7 +11,11 @@ This mobile travel tool uses Operate mode. The visual direction follows the rest
 
 ## Change boundary
 
-Only `styles.css` and browser theme-color metadata change. JavaScript, business logic, API shapes, database/recovery modules, tests, localStorage keys and DOM action hooks remain unchanged. CSS hides decorative imagery, fake status-bar chrome, section slogans and repeated duration text; the live duration/time range remain visible in the overview.
+Visual changes are limited to `styles.css` and browser theme-color metadata. CSS hides decorative imagery, fake status-bar chrome, section slogans and repeated duration text; the live duration/time range remain visible in the overview.
+
+## Upstream reservation integration
+
+This branch incorporates Ray's `5abcd8f81884fc8f58acf7c18181bfe58368ac37` commit, which connects the existing booking and waitlist interface to SQLite. All JavaScript, server/database/recovery modules, tests and functional HTML hooks match that upstream version. The booking panel's filters, inventory rows, confirmation actions and queue states use the same visual tokens as the rest of this UI. Relative to that upstream commit, only `styles.css`, the theme-color metadata and this design document differ.
 
 Reference: https://apps.apple.com/us/app/cathay-pacific/id305038764
 
