@@ -22,6 +22,7 @@ const FILES = {
   '/reservation-model.js': ['reservation-model.js', 'text/javascript; charset=utf-8'],
   '/reservation-ui.js': ['reservation-ui.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
+  '/assets/fonts/lounge-sans-tc.woff2': ['assets/fonts/lounge-sans-tc.woff2', 'font/woff2'],
   '/assets/lounge-hero.png': ['assets/lounge-hero.png', 'image/png'],
   '/assets/lounge-scenes.png': ['assets/lounge-scenes.png', 'image/png']
 };
