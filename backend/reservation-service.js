@@ -25,6 +25,15 @@ function createReservationService({ db, clock = () => new Date(), offerTtlMs = 3
       throw error;
     }
   }
+  let transactionId=0;
+  function transaction(operation) {
+    if(!db.isTransaction)return withTransaction(db,operation);
+    // An explicit demo reset may compose synchronous service calls atomically.
+    const name='reservation_service_'+(++transactionId);
+    db.exec('SAVEPOINT '+name);
+    try {const result=operation();db.exec('RELEASE '+name);return result;}
+    catch(error){db.exec('ROLLBACK TO '+name+'; RELEASE '+name);throw error;}
+  }
   function user(id) {
     positiveId(id, 'userId');
     const found = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
@@ -150,7 +159,7 @@ function createReservationService({ db, clock = () => new Date(), offerTtlMs = 3
 
   function mutation(slotIds, operation) {
     const now = utcTimestamp(clock);
-    const result = database(() => withTransaction(db, () => {
+    const result = database(() => transaction(() => {
       for (const id of [...new Set(slotIds)]) maintain(slot(id), now);
       // Housekeeping must survive a rejected booking, but a failed replacement must
       // roll back all of its own changes. No async work runs within either boundary.
@@ -275,7 +284,7 @@ function createReservationService({ db, clock = () => new Date(), offerTtlMs = 3
   }
   function offerAvailableSlot(slotId) {
     positiveId(slotId, 'slotId');
-    return database(() => withTransaction(db, () => {
+    return database(() => transaction(() => {
       const selectedSlot = slot(slotId); requireReservable(selectedSlot);
       return maintain(selectedSlot, utcTimestamp(clock));
     }));
@@ -323,7 +332,45 @@ function createReservationService({ db, clock = () => new Date(), offerTtlMs = 3
     });
   }
 
-  return Object.freeze({ listLounges, listServices, listAvailableSlots, getSlotAvailability, createReservation,
+  // Operator inventory controls use the same connection, transaction and validation boundary.
+  function createServiceSlot(input) {
+    const { loungeServiceId, date, start, end, capacity } = input || {};
+    positiveId(loungeServiceId, 'loungeServiceId'); serviceDate(date);
+    if (![start,end].every(t => typeof t === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(t)) || start >= end || !Number.isInteger(capacity) || capacity < 1 || capacity > 1000) {
+      throw new ReservationError('INVALID_INPUT', '日期、時間或容量無效。');
+    }
+    return database(() => transaction(() => {
+      const link = db.prepare(`SELECT ls.*, s.default_duration_minutes, l.opening_time, l.closing_time, l.active AS lounge_active
+        FROM lounge_services ls JOIN services s ON s.id=ls.service_id JOIN lounges l ON l.id=ls.lounge_id WHERE ls.id=?`).get(loungeServiceId);
+      if (!link || !link.active || !link.lounge_active) throw new ReservationError('INVALID_INPUT', '請選擇已啟用的貴賓室服務。');
+      if (link.reservation_mode === 'walk_in') throw new ReservationError('WALK_IN_ONLY', '臨時到訪服務不設預約時段。', 409);
+      const minutes = t => Number(t.slice(0,2))*60+Number(t.slice(3));
+      if (minutes(end)-minutes(start) !== link.default_duration_minutes || start < link.opening_time || end > link.closing_time) throw new ReservationError('INVALID_INPUT', '時段須符合服務時長及示範營業時間。');
+      if (db.prepare('SELECT id FROM service_slots WHERE lounge_service_id=? AND service_date=? AND start_time < ? AND end_time > ?').get(loungeServiceId,date,end,start)) throw new ReservationError('SLOT_CONFLICT', '此服務已有重疊時段（包括已停用時段）。',409);
+      const id = db.prepare('SELECT coalesce(max(id),0)+1 AS id FROM service_slots').get().id;
+      db.prepare('INSERT INTO service_slots(id,lounge_service_id,service_date,start_time,end_time,capacity,active) VALUES (?,?,?,?,?,?,1)').run(id,loungeServiceId,date,start,end,capacity);
+      emit('slot_created',null,null,{slot_id:id},utcTimestamp(clock));
+      return availability(slot(id),utcTimestamp(clock));
+    }));
+  }
+  function updateServiceSlot(slotId, changes) {
+    positiveId(slotId,'slotId');
+    if (!changes || !Object.keys(changes).length || Object.keys(changes).some(k => !['capacity','active'].includes(k)) || (changes.active !== undefined && typeof changes.active !== 'boolean') || (changes.capacity !== undefined && (!Number.isInteger(changes.capacity) || changes.capacity < 1 || changes.capacity > 1000))) throw new ReservationError('INVALID_INPUT','容量或啟用狀態無效。');
+    return database(() => transaction(() => {
+      const selected = slot(slotId), now=utcTimestamp(clock);
+      maintain(selected,now);
+      const inventory=availability(selected,now);
+      if (changes.capacity !== undefined && changes.capacity < inventory.occupied+inventory.held) throw new ReservationError('CAPACITY_FLOOR','容量不能少於已佔用及邀請保留名額。',409);
+      if (changes.active === false && (inventory.occupied || inventory.held || inventory.waiting_count)) throw new ReservationError('SLOT_IN_USE','請先處理現有預約及候補，才可停用時段。',409);
+      db.prepare('UPDATE service_slots SET capacity=?,active=? WHERE id=?').run(changes.capacity ?? selected.capacity,changes.active === undefined ? selected.active : Number(changes.active),slotId);
+      maintain(slot(slotId),now);
+      emit('slot_updated',null,null,{slot_id:slotId,...changes},now);
+      return availability(slot(slotId),now);
+    }));
+  }
+  function removeServiceSlot(slotId) { return updateServiceSlot(slotId,{active:false}); }
+
+  return Object.freeze({ createServiceSlot, updateServiceSlot, removeServiceSlot, listLounges, listServices, listAvailableSlots, getSlotAvailability, createReservation,
     getUserReservations, cancelReservation, joinWaitlist, cancelWaitlistEntry, getWaitlistPosition,
     getUserWaitlist, offerAvailableSlot, acceptWaitlistOffer, replaceReservation });
 }

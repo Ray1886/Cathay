@@ -100,7 +100,9 @@
     }
     function filter(name,value){if(!busy&&!pending){filters[name]=value;render();}}
     function close(){visible=false;}
-    function tick(){if(visible&&!busy&&!pending)return load();}
+    // Inventory can change in the operations tab while this sheet is closed.
+    // Never refresh a pending confirmation or replace a user's activity draft.
+    function tick(){if(!busy&&!pending)return load();}
     return {open,load,action,commit,filter,close,tick,get:()=>({slots,reservations,waitlist,pending,busy})};
   }
   return {createController};

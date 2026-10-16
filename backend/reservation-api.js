@@ -217,4 +217,4 @@ function createReservationApi({ service, beforeMutation }) {
   };
 }
 
-module.exports = { createReservationApi, MAX_BODY_BYTES };
+module.exports = { createReservationApi, MAX_BODY_BYTES, verifyLocalRequest, readBody, allowedObject, queryObject };

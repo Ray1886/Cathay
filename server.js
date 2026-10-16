@@ -10,11 +10,17 @@ const {epoch}=require('./recovery/time');
 const {randomUUID}=require('node:crypto');
 const {createReservationApi}=require('./backend/reservation-api');
 const {createIntentValidator}=require('./backend/reservation-integration');
+const {createOperationsService}=require('./backend/operations-service');
+const {createOperationsApi}=require('./backend/operations-api');
 
 const ROOT = __dirname;
 const DEEPSEEK_CHAT_URL = 'https://api.deepseek.com/chat/completions';
 const FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
+  '/ops': ['ops.html', 'text/html; charset=utf-8'],
+  '/ops.html': ['ops.html', 'text/html; charset=utf-8'],
+  '/ops.js': ['ops.js', 'text/javascript; charset=utf-8'],
+  '/ops.css': ['ops.css', 'text/css; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/itinerary.js': ['itinerary.js', 'text/javascript; charset=utf-8'],
@@ -154,11 +160,12 @@ function sendJson(response, status, payload) {
   response.end(JSON.stringify(payload));
 }
 
-function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = process.env.DEEPSEEK_MODEL || 'deepseek-flash', fetchImpl = fetch, reservationService } = {}) {
+function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = process.env.DEEPSEEK_MODEL || 'deepseek-flash', fetchImpl = fetch, reservationService, operationsApi, operationsService } = {}) {
   const previews=new Map();
   const reservationApi=reservationService?createReservationApi({service:reservationService,beforeMutation:createIntentValidator(reservationService)}):null;
   return http.createServer(async (request, response) => {
     const url = new URL(request.url, 'http://localhost');
+    if(operationsApi&&await operationsApi(request,response))return;
     if(reservationApi&&await reservationApi(request,response))return;
     if(url.pathname==='/api/configure'||url.pathname.startsWith('/api/recovery')) {
       const socket=request.socket,host=request.headers.host;
@@ -174,6 +181,7 @@ function createAppServer({ apiKey = process.env.DEEPSEEK_API_KEY, model = proces
         }
         if(url.pathname==='/api/recovery') {
           const recovered=await handleRecovery(body,reservationService);
+          operationsService?.observeRecovery(recovered);
           const previewId=randomUUID();
           for(const [id,value] of previews)if(value.expiresAt<Date.now())previews.delete(id);
           if(previews.size>=100)previews.delete(previews.keys().next().value);
@@ -286,7 +294,9 @@ if (require.main === module) {
   const db=openDatabase({filename:DEFAULT_DATABASE_PATH});
   seedDatabase(db,{date:new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Hong_Kong',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())});
   const reservationService=createReservationService({db});
-  const server=createAppServer({reservationService});
+  const operationsService=createOperationsService({db,service:reservationService});
+  const operations=createOperationsApi({db,service:reservationService,operations:operationsService});
+  const server=createAppServer({reservationService,operationsApi:operations.handler,operationsService});
   // Expire holds and promote the next waiter even when nobody performs a mutation.
   const maintenance=setInterval(()=>{try{for(const slot of reservationService.listAvailableSlots({includeFull:true}))if(slot.reservation_mode!=='walk_in')reservationService.offerAvailableSlot(slot.slot_id);}catch(_){console.error('预约邀请维护失败，请检查本地数据库。');}},5000);
   maintenance.unref();
@@ -299,6 +309,12 @@ if (require.main === module) {
   server.listen(port, '127.0.0.1', () => {
     const pageUrl = 'http://127.0.0.1:' + port + '/';
     console.log('貴賓室原型已啟動：' + pageUrl);
+    console.log('本機營運一次性入口（請勿分享）：'+pageUrl+'ops#token='+operations.accessToken);
+    if(process.env.OPEN_OPERATIONS==='1'&&process.platform==='win32'){
+      const browser=spawn('rundll32.exe',['url.dll,FileProtocolHandler',pageUrl+'ops#token='+operations.accessToken],{stdio:'ignore',windowsHide:true});
+      browser.on('error',()=>console.log('無法自動開啟瀏覽器，請使用上方營運一次性入口。'));
+      browser.unref();
+    }
     console.log(process.env.DEEPSEEK_API_KEY ? '模式：DeepSeek AI' : '模式：演示（未設定 DEEPSEEK_API_KEY）');
     console.log('請保持此終端視窗開啟；關閉視窗後，本機頁面就無法使用。');
     if (process.env.OPEN_BROWSER === '1' && process.platform === 'darwin') {

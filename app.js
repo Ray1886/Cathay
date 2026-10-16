@@ -293,7 +293,7 @@ function initBookings(){
   if(!globalThis.ReservationUI)return;
   bookingUI=globalThis.ReservationUI.createController({context:()=>({...currentContext(),serviceDate:globalThis.ReservationModel.tripDate(currentContext())}),show:html=>{if($('#sheet').open)$('#sheetBody').innerHTML=html;},update:next=>{activities=next;nextId=Math.max(nextId,...next.map(a=>a.id+1));if(recoveryJourney)recoveryJourney={...recoveryJourney,currentItinerary:next.map(a=>({...a}))};save();render();renderChat();},notify:toast});
   bookingUI.load();
-  setInterval(()=>{if($('#sheet').open)bookingUI.tick();},5000);
+  setInterval(()=>bookingUI.tick(),2500);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)bookingUI.load();});
 }
 function stageProposal(payload){

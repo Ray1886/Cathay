@@ -11,6 +11,7 @@
     "test:reservations": "node --test tests/reservation*.test.js",
     "db:init": "node database/seed.js",
     "demo:reservations": "node scripts/reservation-demo.js",
+    "demo:ops:reset": "node database/operations-demo.js",
     "reservations:server": "node backend/demo-server.js"
   }
 }

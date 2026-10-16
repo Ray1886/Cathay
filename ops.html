@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>貴賓室運營中心</title><link rel="stylesheet" href="./ops.css"><script src="./ops.js" defer></script></head>
+<body>
+  <a class="skip" href="#content">跳至主要內容</a>
+  <aside class="sidebar" aria-label="主要導覽">
+    <div class="brand"><svg width="48" height="36" viewBox="0 0 60 40" aria-hidden="true"><path d="M4 7 52 20 25 27 12 20 35 21Z" fill="currentColor"/><path d="m16 29 37-7-21 13Z" fill="currentColor" opacity=".55"/></svg><span>貴賓室運營</span></div>
+    <nav>
+      <button data-page="overview" class="active"><span data-icon="home"></span>運營概覽</button>
+      <button data-page="traffic"><span data-icon="chart"></span>客流預測</button>
+      <button data-page="staff"><span data-icon="people"></span>人力資源</button>
+      <button data-page="bookings"><span data-icon="calendar"></span>預約處理</button>
+    </nav>
+    <div class="side-foot"><span class="dot"></span> 本機示範環境<br><small>航班及人力為合成資料</small><a href="/" target="_blank" rel="noopener">開啟旅客介面 ↗</a></div>
+  </aside>
+  <div class="workspace">
+    <header><div class="heading"><h1>貴賓室運營中心</h1><span class="divider"></span><h2 id="pageTitle">運營概覽</h2></div><div class="header-controls"><label class="date-label">示範日期<input id="selectedDate" type="date" aria-label="選擇示範日期"></label><span id="syncStatus" class="sync" role="status"><span class="dot"></span>正在連線</span></div></header>
+    <main id="content" tabindex="-1"><div class="empty">正在讀取共用預約資料…</div></main>
+    <footer>本機原型 · 預約／候補由 SQLite 提供 · 服務組合、在場人數、航班及人力均為示範，不代表國泰實際營運規則。</footer>
+  </div>
+  <dialog id="actionDialog" aria-labelledby="dialogTitle"><div class="dialog-head"><h2 id="dialogTitle"></h2><button id="closeDialog" class="icon-button" aria-label="關閉">×</button></div><div id="dialogBody"></div><p id="dialogError" class="error" role="alert"></p><div class="dialog-actions"><button id="backDialog" class="secondary">返回</button><button id="confirmDialog" class="primary">確認操作</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body></html>
