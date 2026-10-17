@@ -1,0 +1,358 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T14:46:33.096182Z",
+  "title": "Design System: Lounge itinerary prototype",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Deep teal",
+        "tonalRamp": [
+          "oklch(15.0% 0.0793 186.5)",
+          "oklch(26.4% 0.0793 186.5)",
+          "oklch(37.9% 0.0793 186.5)",
+          "oklch(49.3% 0.0793 186.5)",
+          "oklch(60.7% 0.0793 186.5)",
+          "oklch(72.1% 0.0793 186.5)",
+          "oklch(83.6% 0.0793 186.5)",
+          "oklch(95.0% 0.0793 186.5)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Deep teal hover",
+        "tonalRamp": [
+          "oklch(15.0% 0.0663 185.9)",
+          "oklch(26.4% 0.0663 185.9)",
+          "oklch(37.9% 0.0663 185.9)",
+          "oklch(49.3% 0.0663 185.9)",
+          "oklch(60.7% 0.0663 185.9)",
+          "oklch(72.1% 0.0663 185.9)",
+          "oklch(83.6% 0.0663 185.9)",
+          "oklch(95.0% 0.0663 185.9)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Deep green-black",
+        "tonalRamp": [
+          "oklch(15.0% 0.0224 177.6)",
+          "oklch(26.4% 0.0224 177.6)",
+          "oklch(37.9% 0.0224 177.6)",
+          "oklch(49.3% 0.0224 177.6)",
+          "oklch(60.7% 0.0224 177.6)",
+          "oklch(72.1% 0.0224 177.6)",
+          "oklch(83.6% 0.0224 177.6)",
+          "oklch(95.0% 0.0224 177.6)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted green-grey",
+        "tonalRamp": [
+          "oklch(15.0% 0.0175 170.5)",
+          "oklch(26.4% 0.0175 170.5)",
+          "oklch(37.9% 0.0175 170.5)",
+          "oklch(49.3% 0.0175 170.5)",
+          "oklch(60.7% 0.0175 170.5)",
+          "oklch(72.1% 0.0175 170.5)",
+          "oklch(83.6% 0.0175 170.5)",
+          "oklch(95.0% 0.0175 170.5)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White surface",
+        "tonalRamp": [
+          "oklch(15.0% 0.0000 0.0)",
+          "oklch(26.4% 0.0000 0.0)",
+          "oklch(37.9% 0.0000 0.0)",
+          "oklch(49.3% 0.0000 0.0)",
+          "oklch(60.7% 0.0000 0.0)",
+          "oklch(72.1% 0.0000 0.0)",
+          "oklch(83.6% 0.0000 0.0)",
+          "oklch(95.0% 0.0000 0.0)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Off-white canvas",
+        "tonalRamp": [
+          "oklch(15.0% 0.0025 165.1)",
+          "oklch(26.4% 0.0025 165.1)",
+          "oklch(37.9% 0.0025 165.1)",
+          "oklch(49.3% 0.0025 165.1)",
+          "oklch(60.7% 0.0025 165.1)",
+          "oklch(72.1% 0.0025 165.1)",
+          "oklch(83.6% 0.0025 165.1)",
+          "oklch(95.0% 0.0025 165.1)"
+        ]
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "Soft green",
+        "tonalRamp": [
+          "oklch(15.0% 0.0075 164.9)",
+          "oklch(26.4% 0.0075 164.9)",
+          "oklch(37.9% 0.0075 164.9)",
+          "oklch(49.3% 0.0075 164.9)",
+          "oklch(60.7% 0.0075 164.9)",
+          "oklch(72.1% 0.0075 164.9)",
+          "oklch(83.6% 0.0075 164.9)",
+          "oklch(95.0% 0.0075 164.9)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Fine separator",
+        "tonalRamp": [
+          "oklch(15.0% 0.0067 160.1)",
+          "oklch(26.4% 0.0067 160.1)",
+          "oklch(37.9% 0.0067 160.1)",
+          "oklch(49.3% 0.0067 160.1)",
+          "oklch(60.7% 0.0067 160.1)",
+          "oklch(72.1% 0.0067 160.1)",
+          "oklch(83.6% 0.0067 160.1)",
+          "oklch(95.0% 0.0067 160.1)"
+        ]
+      },
+      "warning": {
+        "role": "status",
+        "displayName": "Warning brown",
+        "tonalRamp": [
+          "oklch(15.0% 0.0899 71.8)",
+          "oklch(26.4% 0.0899 71.8)",
+          "oklch(37.9% 0.0899 71.8)",
+          "oklch(49.3% 0.0899 71.8)",
+          "oklch(60.7% 0.0899 71.8)",
+          "oklch(72.1% 0.0899 71.8)",
+          "oklch(83.6% 0.0899 71.8)",
+          "oklch(95.0% 0.0899 71.8)"
+        ]
+      },
+      "warning-bg": {
+        "role": "status",
+        "displayName": "Warning surface",
+        "tonalRamp": [
+          "oklch(15.0% 0.0171 84.6)",
+          "oklch(26.4% 0.0171 84.6)",
+          "oklch(37.9% 0.0171 84.6)",
+          "oklch(49.3% 0.0171 84.6)",
+          "oklch(60.7% 0.0171 84.6)",
+          "oklch(72.1% 0.0171 84.6)",
+          "oklch(83.6% 0.0171 84.6)",
+          "oklch(95.0% 0.0171 84.6)"
+        ]
+      },
+      "error": {
+        "role": "status",
+        "displayName": "Error red",
+        "tonalRamp": [
+          "oklch(15.0% 0.1442 28.5)",
+          "oklch(26.4% 0.1442 28.5)",
+          "oklch(37.9% 0.1442 28.5)",
+          "oklch(49.3% 0.1442 28.5)",
+          "oklch(60.7% 0.1442 28.5)",
+          "oklch(72.1% 0.1442 28.5)",
+          "oklch(83.6% 0.1442 28.5)",
+          "oklch(95.0% 0.1442 28.5)"
+        ]
+      },
+      "confirmed": {
+        "role": "status",
+        "displayName": "Confirmed green",
+        "tonalRamp": [
+          "oklch(15.0% 0.0814 164.4)",
+          "oklch(26.4% 0.0814 164.4)",
+          "oklch(37.9% 0.0814 164.4)",
+          "oklch(49.3% 0.0814 164.4)",
+          "oklch(60.7% 0.0814 164.4)",
+          "oklch(72.1% 0.0814 164.4)",
+          "oklch(83.6% 0.0814 164.4)",
+          "oklch(95.0% 0.0814 164.4)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control border",
+        "tonalRamp": [
+          "oklch(15.0% 0.0161 154.4)",
+          "oklch(26.4% 0.0161 154.4)",
+          "oklch(37.9% 0.0161 154.4)",
+          "oklch(49.3% 0.0161 154.4)",
+          "oklch(60.7% 0.0161 154.4)",
+          "oklch(72.1% 0.0161 154.4)",
+          "oklch(83.6% 0.0161 154.4)",
+          "oklch(95.0% 0.0161 154.4)"
+        ]
+      },
+      "preview-background": {
+        "role": "neutral",
+        "displayName": "Desktop surround",
+        "tonalRamp": [
+          "oklch(15.0% 0.0050 165.0)",
+          "oklch(26.4% 0.0050 165.0)",
+          "oklch(37.9% 0.0050 165.0)",
+          "oklch(49.3% 0.0050 165.0)",
+          "oklch(60.7% 0.0050 165.0)",
+          "oklch(72.1% 0.0050 165.0)",
+          "oklch(83.6% 0.0050 165.0)",
+          "oklch(95.0% 0.0050 165.0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Planner title",
+        "purpose": "Main itinerary navigation title."
+      },
+      "title": {
+        "displayName": "Task title",
+        "purpose": "Assistant and shared sheet headings."
+      },
+      "section": {
+        "displayName": "Section heading",
+        "purpose": "Itinerary and service-discovery headings."
+      },
+      "activity": {
+        "displayName": "Activity title",
+        "purpose": "Readable timeline activity names."
+      },
+      "body": {
+        "displayName": "Interface body",
+        "purpose": "Default interface content."
+      },
+      "conversation": {
+        "displayName": "Conversation body",
+        "purpose": "Message reading text."
+      },
+      "label": {
+        "displayName": "Supporting label",
+        "purpose": "Secondary context and state text."
+      },
+      "field": {
+        "displayName": "Form field",
+        "purpose": "Native input/select text in labelled task fields."
+      }
+    },
+    "shadows": [
+      {
+        "name": "activity-menu",
+        "value": "0 5px 26px #173d2821",
+        "purpose": "Open native activity action menu."
+      },
+      {
+        "name": "booking-selected",
+        "value": "0 1px 3px #173d2810",
+        "purpose": "Selected booking segment against the navigation track."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.22, 1, .36, 1)",
+        "purpose": "Transform easing for controls, sheet entry and toast."
+      },
+      {
+        "name": "control-duration",
+        "value": "160ms",
+        "purpose": "Control background, border, text and transform transitions."
+      },
+      {
+        "name": "sheet-entry-duration",
+        "value": "220ms",
+        "purpose": "Sheet opacity and 16px entry offset."
+      },
+      {
+        "name": "toast-duration",
+        "value": "180ms",
+        "purpose": "Toast opacity and 8px offset transition."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Reduced-motion media query removes transitions and animation."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "360px"
+      },
+      {
+        "name": "desktop-preview",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Sheet primary action",
+      "kind": "button",
+      "refersTo": "button-sheet-primary",
+      "description": "Full-width task confirmation, with the existing approval behavior kept in the application.",
+      "html": "<button type=\"button\" class=\"ds-sheet-primary\">保存活動</button>",
+      "css": ".ds-sheet-primary{width:100%;min-height:48px;margin-top:14px;padding:11px 16px;border:0;border-radius:var(--radius,10px);background:var(--accent,#00645d);color:var(--surface,#ffffff);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:15px;font-weight:500;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-sheet-primary:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}.ds-sheet-primary:active:not(:disabled){transform:scale(.98)}.ds-sheet-primary:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-sheet-primary:hover{background:var(--accent-hover,#004d47)}}"
+    },
+    {
+      "name": "Native form field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Label and native control used in shared task sheets.",
+      "html": "<label class=\"ds-field\">開始時間<input type=\"time\" value=\"17:30\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:7px;margin:18px 0;color:var(--ink,#23332f);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:13px;font-weight:500}.ds-field input{width:100%;min-width:0;min-height:48px;padding:11px 12px;border:1px solid #d0dbd3;border-radius:8px;background:var(--surface,#ffffff);color:var(--ink,#23332f);font:inherit;font-size:16px;caret-color:var(--accent,#00645d);transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-field input:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}"
+    },
+    {
+      "name": "Booking view navigation",
+      "kind": "nav",
+      "refersTo": "booking-navigation",
+      "description": "Three distinct booking views with a selected white segment.",
+      "html": "<nav class=\"ds-booking-tabs\" aria-label=\"預約分類\"><button type=\"button\" aria-pressed=\"true\">可選時段</button><button type=\"button\" aria-pressed=\"false\">我的預約</button><button type=\"button\" aria-pressed=\"false\">我的候補</button></nav>",
+      "css": ".ds-booking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;margin:12px 0 18px;border-radius:9px;background:var(--canvas,#f5f7f6)}.ds-booking-tabs button{min-width:0;min-height:42px;padding:7px 3px;border:0;border-radius:6px;background:transparent;color:var(--muted,#63706b);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:13px;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-booking-tabs button[aria-pressed=true]{background:var(--surface,#ffffff);color:var(--ink,#23332f);box-shadow:0 1px 3px #173d2810}.ds-booking-tabs button:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}.ds-booking-tabs button:active:not(:disabled){transform:scale(.98)}.ds-booking-tabs button:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-booking-tabs button:hover{color:var(--ink,#23332f)}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A familiar lounge itinerary",
+    "overview": "This mobile travel tool uses Operate mode: a traveller should understand the available time, current activities and next action without decoding a dashboard. The approved direction follows the restrained white surfaces, dark teal actions and clear flight information in [Cathay Pacific's official App Store screenshots](https://apps.apple.com/us/app/cathay-pacific/id305038764). It remains a hackathon prototype without official branding or a claim of affiliation.\n\nThis refresh records the implemented system in styles.css, index.html, app.js and reservation-ui.js. It includes compact flight context, a simpler timeline, native activity menus, a text-only itinerary and illustrated service rows, separate booking views and a local Traditional Chinese font. The follow-up restores the original four-point assistant mark, adds softly tinted conversation space with framed AI replies, and aligns the planner footer with the assistant toolbar. It supersedes the previous claim that the branch differs only in CSS and theme-color metadata. Reservation integration retains its recorded provenance in Ray's upstream commit 5abcd8f81884fc8f58acf7c18181bfe58368ac37; presentation changes do not redefine its API, approval or business rules.",
+    "keyCharacteristics": [
+      "White reading surfaces with restrained teal actions and explicit state text.",
+      "Local Lounge Sans TC for the bundled interface, with system fallback for missing glyphs.",
+      "Compact flight context, a readable timeline and flat service rows.",
+      "Native disclosure for activity actions and inventory diagnostics.",
+      "Fixed planning actions and conversation input, with independently scrolling content."
+    ],
+    "rules": [
+      {
+        "name": "The State With Text Rule",
+        "body": "Confirmed, pending, offered and expired states retain readable labels; color never stands in for the booking state or approval requirement.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Interface Typeface Rule",
+        "body": "Keep operational headings, forms and messages in the bundled interface family and its fallback stack; do not introduce a decorative display pairing or synthesize unprovided weights.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Except Overlays Rule",
+        "body": "Keep ordinary activity and service content flat; use the existing menu and selected-segment shadows only for those specific layers.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep flight context compact and give the actual itinerary the main reading space.",
+      "**Do** use the bundled interface font with its explicit fallback stack and tabular time values.",
+      "**Do** use flat service rows, clear separators and native disclosure for secondary actions.",
+      "**Do** preserve all five quick actions, native controls and keyboard focus.",
+      "**Do** keep booking state, demonstration labels and confirmation requirements explicit.",
+      "**Do** preserve existing API, approval, reservation, timing and recovery rules when changing presentation."
+    ],
+    "donts": [
+      "**Don't** reintroduce decorative hero photography, fake device status chrome, section slogans or nested discovery cards.",
+      "**Don't** treat a pending proposal, queue entry or offered slot as an approved reservation.",
+      "**Don't** present SQLite demo inventory or a simulated flight as live Cathay data.",
+      "**Don't** add a display font, synthetic font weight or a claim of complete CJK coverage.",
+      "**Don't** generalize current smaller target exceptions or hidden legacy decorative symbols into component defaults.",
+      "**Don't** apply overlay shadows to every list row or plain container."
+    ]
+  }
+}
