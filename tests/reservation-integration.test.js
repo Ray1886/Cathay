@@ -33,13 +33,13 @@ test('UI preview/back has no writes; approval books once and reload reconciles a
 test('UI joins real FIFO queue, renders offer and accepts it into one persisted booking',async t=>{
   const f=await fixture(t);const other=f.service.createReservation(2,1001,'fifo-owner');await f.ui.open();await f.ui.action('join',1001);assert.equal(await f.ui.commit(),true);
   const entry=f.ui.get().waitlist.find(w=>w.service_slot_id===1001);assert.equal(entry.position,1);assert.equal(f.get().activities.find(a=>a.slotId===1001).bookingState,'waiting');assert.match(f.html(),/第 1 位/);
-  f.service.cancelReservation(other.id,2);await f.ui.load();assert.equal(f.ui.get().waitlist.find(w=>w.id===entry.id).status,'offered');assert.match(f.html(),/接受邀请/);
+  f.service.cancelReservation(other.id,2);await f.ui.load();assert.equal(f.ui.get().waitlist.find(w=>w.id===entry.id).status,'offered');assert.match(f.html(),/接受邀請/);
   await f.ui.action('accept',entry.id);assert.equal(await f.ui.commit(),true);assert.equal(f.get().activities.find(a=>a.slotId===1001).status,'confirmed');assert.equal(f.service.getUserWaitlist(1).find(w=>w.id===entry.id).status,'accepted');
 });
 test('expired offers are displayed and cannot be accepted',async t=>{
   const f=await fixture(t),other=f.service.createReservation(2,1001,'expiry-owner');await f.ui.open();await f.ui.action('join',1001);await f.ui.commit();f.service.cancelReservation(other.id,2);await f.ui.load();
   const entry=f.ui.get().waitlist.find(w=>w.service_slot_id===1001);await f.ui.action('accept',entry.id);f.advance(1100);assert.equal(await f.ui.commit(),false);assert.equal(f.service.getUserReservations(1).filter(r=>r.service_slot_id===1001).length,0);
-  await f.ui.action('back',0);assert.match(f.html(),/邀请已过期/);
+  await f.ui.action('back',0);assert.match(f.html(),/邀請已過期/);
 });
 test('replacement rechecks capacity, leaves original intact on conflict, then commits atomically',async t=>{
   const f=await fixture(t);f.db.prepare("INSERT INTO service_slots(id,lounge_service_id,service_date,start_time,end_time,capacity,active) VALUES (2001,103,'2026-10-11','18:35','18:50',1,1)").run();
@@ -54,7 +54,7 @@ test('stale itinerary blocks approval; unknown locations, dates and overlapping 
 });
 test('failed inventory request produces a retry error instead of invented capacity',async()=>{
   let html='';const ui=createController({context:()=>({activities:[]}),fetchImpl:async()=>{throw Error('offline');},show:value=>{html=value;},update:()=>{throw Error('must not update');}});
-  await ui.open();assert.equal(ui.get().slots.length,0);assert.match(html,/连接失败/);assert.doesNotMatch(html,/示範空位|示範排隊/);
+  await ui.open();assert.equal(ui.get().slots.length,0);assert.match(html,/連接失敗/);assert.doesNotMatch(html,/示範空位|示範排隊/);
 });
 test('ambiguous booking response retries the same key without a duplicate record',async t=>{
   const f=await fixture(t);let once=true,keys=[];
