@@ -52,6 +52,7 @@
       </div>
     </header>
     <div class="planner-content">
+      <p id="siteModeNotice" class="site-mode-notice" role="status" hidden>网页演示 · 行程保存在当前设备；预约、突发恢复与 AI 需使用完整服务。</p>
       <section class="overview" aria-label="行程概覽"><div class="overview-main"><small>可用時間</small><strong id="overviewDuration">1小時45分</strong><span id="overviewWindow">17:30 – 19:15</span></div><button id="changeArrival" class="arrival-link" type="button" aria-label="修改到達時間">修改<svg><use href="#i-chevron"/></svg></button><p id="remainingText">還可探索更多服務</p></section>
       <section class="schedule" aria-labelledby="scheduleTitle"><div class="section-head"><div class="section-title"><h2 id="scheduleTitle">我的行程</h2><span class="section-count"><span id="activityCount">3</span> 項活動</span></div><button id="reorderButton" class="tiny-button" type="button"><svg><use href="#i-arrows"/></svg> 重新排序</button></div><div id="planWarnings" class="warning" hidden></div><div id="bookingNotice" class="warning" hidden></div><div id="activityList" class="timeline"></div><div class="boarding-strip"><div><svg><use href="#i-plane"/></svg><strong>登機 <span data-boarding-time>19:20</span></strong><span>登機口 <b id="stripGate">25</b></span></div><button id="changeBoarding" type="button">修改</button></div><p id="boardingRecommendation" class="boarding-recommendation"></p></section>
       <section class="discover" aria-labelledby="discoverTitle"><div class="section-head"><div class="section-title"><h2 id="discoverTitle">可添加行程</h2></div><button id="viewAll" class="link-button" type="button">查看全部 <svg><use href="#i-chevron"/></svg></button></div><div id="serviceList" class="service-list"></div></section>
@@ -66,6 +67,7 @@
 </main>
 <dialog id="sheet" class="sheet"><div class="sheet-head"><div><small id="sheetEyebrow">行程管理</small><h2 id="sheetTitle"></h2></div><button id="closeSheet" type="button" aria-label="關閉"><svg><use href="#i-close"/></svg></button></div><div id="sheetBody"></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="./site-config.js"></script>
 <script src="./travel-time.js"></script>
 <script src="./itinerary.js"></script>
 <script src="./reservation-model.js"></script>

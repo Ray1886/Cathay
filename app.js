@@ -1,3 +1,4 @@
+const STATIC_DEMO = Boolean(globalThis.CathaySiteConfig?.staticDemo) || (typeof location!=='undefined'&&location.protocol==='file:');
 const ENGINE = typeof module!=='undefined'&&module.exports ? require('./itinerary.js') : globalThis.ItineraryEngine;
 const TRAVEL = typeof module!=='undefined'&&module.exports ? require('./travel-time.js') : globalThis.LoungeTravelTimes||ENGINE.travel;
 const TYPES = {
@@ -286,6 +287,7 @@ function showBoardingSheet(){
 }
 async function showWaitlist(type=''){
   showSheet('預約與候補','<p class="sheet-note">正在載入時段…</p>','預約管理');
+  if(STATIC_DEMO){$('#sheetBody').innerHTML='<p class="sheet-note">网页演示不提供在线预约或候补。您可以浏览和保存行程；查询库存及提交预约需启动完整服务。</p>';return;}
   if(!bookingUI){$('#sheetBody').innerHTML='<p class="sheet-error">預約服務未載入，請透過本機服務開啟頁面。</p>';return;}
   await bookingUI.open(type);
 }
@@ -312,6 +314,7 @@ function closeActivityMenus(except=null){
   document.querySelectorAll('.row-menu[open]').forEach(menu=>{if(menu!==except)menu.open=false;});
 }
 function initBookings(){
+  if(STATIC_DEMO)return;
   if(!globalThis.ReservationUI)return;
   bookingUI=globalThis.ReservationUI.createController({context:()=>({...currentContext(),serviceDate:globalThis.ReservationModel.tripDate(currentContext())}),show:renderBookingPanel,update:next=>{activities=next;nextId=Math.max(nextId,...next.map(a=>a.id+1));if(recoveryJourney)recoveryJourney={...recoveryJourney,currentItinerary:next.map(a=>({...a}))};save();render();renderChat();},notify:toast});
   bookingUI.load();
@@ -387,6 +390,7 @@ function currentContext(){
     activities:sorted().map(a=>({id:a.id,type:a.type,label:TYPES[a.type].label,start:a.start,end:a.end,...(a.startAt?{startAt:a.startAt,endAt:a.endAt}:{}),status:a.status,locationId:a.locationId,venue:a.venue,area:a.area||ENGINE.resolveServiceLocation(a.type,a.locationId).area,reservationId:a.reservationId,slotId:a.slotId,waitlistEntryId:a.waitlistEntryId,bookingState:a.bookingState,loungeServiceId:a.loungeServiceId}))};
 }
 async function checkAgentMode(){
+  if(STATIC_DEMO){$('#agentModeLabel').textContent='网页演示 · 本机规则';$('#liveModeLink').hidden=true;return;}
   if(typeof location==='undefined')return;
   if(location.protocol==='file:'){
     $('#liveModeLink').hidden=false;
@@ -487,10 +491,12 @@ function showRecommendations(){
   showSheet('智能推薦','<p class="sheet-note">依本機已保存行程的個人偏好及示範群體偏好排序。群體比例為原型樣本，並非真實所有旅客資料。</p><div class="recommend-list">'+cards+'</div>','為您推薦');
 }
 function openIncident(){
+  if(STATIC_DEMO){showSheet('突发修改','<p class="sheet-note">此网页仅提供行程演示。突发事件恢复需要完整服务，不会在此修改航班或预约状态。</p>');return;}
   showSheet('突發修改','<form id="incidentForm"><p class="sheet-note">晚到由旅客報告；航班變動由本機模擬提供者產生，並非即時航空資料。先檢查影響並預覽，確認後才保存行程。</p><label class="field">變動類型<select id="incidentType"><option value="late">我會晚到</option><option value="gate">模擬登機口變更</option><option value="delay">模擬起飛延誤</option><option value="boarding">模擬登機時間變更</option></select></label><label class="field"><span id="incidentValueLabel">晚到分鐘數</span><input id="incidentValue" value="20" required></label><label class="field">可選：完整預計到達／登機時間<input id="incidentAt" type="datetime-local"></label><p id="incidentHint" class="sheet-note">分鐘相對原计划到達時間計算，不會在上次晚到時間上累加。跨午夜請填完整日期。</p><button class="sheet-primary" type="submit">檢查影響並產生恢復建議</button></form>','突發恢復引擎');
 }
 async function recoveryPost(route,body){const response=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const result=await response.json();if(!response.ok)throw new Error(result.error||'RECOVERY_FAILED');return result;}
 async function runRecovery(action,value,fullTime){
+  if(STATIC_DEMO){showScreen('agent');addMessage('agent','网页演示暂不提供事件恢复，请使用完整服务生成恢复草案。');return false;}
   if(recoveryBusy){toast('正在處理上一個突發事件，請稍候。');return false;}
   recoveryBusy=true;chatTouched=true;showScreen('agent');
   const before=ENGINE.itinerarySignature(activities,proposalPolicy());
@@ -664,6 +670,6 @@ if(typeof document!=='undefined'){
     if(editingId)activities=activities.map(a=>a.id===editingId?candidate:a);else{activities.push(candidate);nextId++}
     closeSheet();render();toast(editingId?'行程已更新。':'活動已加入行程。');
   });
-  setupVoice();render();renderChat();checkAgentMode();initBookings();
+  setupVoice();render();renderChat();if(STATIC_DEMO)$('#siteModeNotice').hidden=false;checkAgentMode();initBookings();
 }
 if(typeof module!=='undefined')module.exports={parseTypes,planActivities,voiceErrorMessage};

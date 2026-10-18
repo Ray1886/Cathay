@@ -16,6 +16,7 @@ const DEEPSEEK_CHAT_URL = 'https://api.deepseek.com/chat/completions';
 const FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
+  '/site-config.js': ['site-config.js', 'text/javascript; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/itinerary.js': ['itinerary.js', 'text/javascript; charset=utf-8'],
   '/travel-time.js': ['travel-time.js', 'text/javascript; charset=utf-8'],

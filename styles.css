@@ -349,3 +349,5 @@ svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; s
 @media (prefers-reduced-motion:reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.site-mode-notice{margin:12px 0;padding:12px;border-radius:8px;background:var(--soft,#edf5f4);color:var(--muted,#526866);font-size:12px;line-height:1.6}.site-mode-notice[hidden]{display:none}

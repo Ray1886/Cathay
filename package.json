@@ -4,13 +4,18 @@
   "private": true,
   "description": "Synthetic local lounge reservation and waitlist prototype",
   "type": "commonjs",
-  "engines": { "node": ">=24.15.0 <25" },
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
   "scripts": {
     "start": "node server.js",
     "test": "node --test tests/*.test.js",
     "test:reservations": "node --test tests/reservation*.test.js",
     "db:init": "node database/seed.js",
     "demo:reservations": "node scripts/reservation-demo.js",
-    "reservations:server": "node backend/demo-server.js"
+    "reservations:server": "node backend/demo-server.js",
+    "start:ai": "node scripts/start.js --ai",
+    "start:open": "node scripts/start.js",
+    "build:pages": "node scripts/build-pages.js"
   }
 }

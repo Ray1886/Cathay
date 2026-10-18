@@ -1,0 +1,1 @@
+globalThis.CathaySiteConfig = { staticDemo: false };

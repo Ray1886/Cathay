@@ -29,12 +29,13 @@ jobs:
         with:
           enablement: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Prepare static site
-        run: |
-          mkdir _site
-          cp index.html app.js itinerary.js travel-time.js reservation-model.js reservation-ui.js styles.css _site/
-          cp -R assets _site/assets
-          touch _site/.nojekyll
+        run: npm run build:pages
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
