@@ -1,0 +1,71 @@
+{
+  "copyright": "Cathay Pacific. Retains original rights; official source is attributed.",
+  "usage": "Local hackathon interface prototype; not a claim of affiliation, inventory, eligibility or reservation rules.",
+  "images": [
+    {
+      "serviceCode": "shower",
+      "file": "pier-first-shower.jpg",
+      "subject": "Shower suites",
+      "lounge": "The Pier, First / 玉衡堂頭等貴賓室",
+      "url": "https://www.cathaypacific.com/content/dam/focal-point/digital-library/cathay-pacific/lounges/the-pier/first-class/lounge-pier-first-c149.renditionimage.450.300.jpg",
+      "page": "https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-pier-first.html",
+      "sha256": "f767efdd85c1edbcd85e9c5abc1aa787e33b76eef0485c64c6dc53d76cea1b97",
+      "bytes": 20249,
+      "retrieved": "2026-10-19",
+      "provenance": "Cathay Pacific original JPEG image data, with official origin/copyright added as EXIF metadata; no recompression, generation or retouching.",
+      "sourceSha256": "2dd6cf645ac4f24d2a91464605ac65359882d47e56a5b4196d9c9497d0fa0bdd"
+    },
+    {
+      "serviceCode": "massage",
+      "file": "pier-first-massage.jpg",
+      "subject": "Massage service",
+      "lounge": "The Pier, First / 玉衡堂頭等貴賓室",
+      "url": "https://www.cathaypacific.com/content/dam/focal-point/digital-library/cathay-pacific/lounges/the-pier/first-class/lounge-pier-first-c179.renditionimage.450.300.jpg",
+      "page": "https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-pier-first.html",
+      "sha256": "adfd7966ce8638662565fa22fa7246d7f5d47f718c8e18d31b811ac6b3dbcb45",
+      "bytes": 15814,
+      "retrieved": "2026-10-19",
+      "provenance": "Cathay Pacific original JPEG image data, with official origin/copyright added as EXIF metadata; no recompression, generation or retouching.",
+      "sourceSha256": "d3da0e50bc007498fe0b603aa8816de30cad9892f99cb6603bc31d4015d9ae2d"
+    },
+    {
+      "serviceCode": "rest",
+      "file": "pier-first-rest.jpg",
+      "subject": "Day suites",
+      "lounge": "The Pier, First / 玉衡堂頭等貴賓室",
+      "url": "https://www.cathaypacific.com/content/dam/focal-point/digital-library/cathay-pacific/lounges/the-pier/first-class/lounge-pier-first-c234.renditionimage.450.300.jpg",
+      "page": "https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-pier-first.html",
+      "sha256": "a63cec68a2b1bc40cd6a304ba63108d38faeaeb3b16f71aed419e7f202be25bf",
+      "bytes": 17220,
+      "retrieved": "2026-10-19",
+      "provenance": "Cathay Pacific original JPEG image data, with official origin/copyright added as EXIF metadata; no recompression, generation or retouching.",
+      "sourceSha256": "74827ed630cc1f5070fd3aabe5c64eed5a8c7a9a53824276b23513ce1ae327be"
+    },
+    {
+      "serviceCode": "work",
+      "file": "pier-first-work.jpg",
+      "subject": "The Bureau",
+      "lounge": "The Pier, First / 玉衡堂頭等貴賓室",
+      "url": "https://www.cathaypacific.com/content/dam/focal-point/digital-library/cathay-pacific/lounges/the-pier/first-class/lounge-pier-first-c078.renditionimage.450.300.jpg",
+      "page": "https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-pier-first.html",
+      "sha256": "497d52042e9d1e734f72ae803fc1c88dfbe18d47e2c81ee268cfffc36b58bb1a",
+      "bytes": 18163,
+      "retrieved": "2026-10-19",
+      "provenance": "Cathay Pacific original JPEG image data, with official origin/copyright added as EXIF metadata; no recompression, generation or retouching.",
+      "sourceSha256": "5309969b4e2ed364f9b5247e09ebc56e4f76c28873b1c2c772dae96fdaab39f1"
+    },
+    {
+      "serviceCode": "dining",
+      "file": "wing-first-dining.jpg",
+      "subject": "The Dining Room",
+      "lounge": "The Wing, First / 寰宇堂頭等貴賓室",
+      "url": "https://www.cathaypacific.com/content/dam/focal-point/digital-library/cathay-pacific/lounges/the-wing/first-class/The-Wing-First_Dining-Room-v2.renditionimage.450.300.jpg",
+      "page": "https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-wing-first.html",
+      "sha256": "6db264d4a40ad4ac67810c2dfbfb7143ffd35f2f791704ecaa4295e9da10f94e",
+      "bytes": 31347,
+      "retrieved": "2026-10-19",
+      "provenance": "Cathay Pacific original JPEG image data, with official origin/copyright added as EXIF metadata; no recompression, generation or retouching.",
+      "sourceSha256": "b7a91ac4b2a1546fc55beee125a574eb4308685a89f83e22ffcce8b2e81e7766"
+    }
+  ]
+}

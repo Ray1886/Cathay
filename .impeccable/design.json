@@ -1,63 +1,63 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-16T14:46:33.096182Z",
+  "generatedAt": "2026-10-19T07:11:58.357035Z",
   "title": "Design System: Lounge itinerary prototype",
   "extensions": {
     "colorMeta": {
       "accent": {
         "role": "primary",
-        "displayName": "Deep teal",
+        "displayName": "Lounge teal",
         "tonalRamp": [
-          "oklch(15.0% 0.0793 186.5)",
-          "oklch(26.4% 0.0793 186.5)",
-          "oklch(37.9% 0.0793 186.5)",
-          "oklch(49.3% 0.0793 186.5)",
-          "oklch(60.7% 0.0793 186.5)",
-          "oklch(72.1% 0.0793 186.5)",
-          "oklch(83.6% 0.0793 186.5)",
-          "oklch(95.0% 0.0793 186.5)"
+          "oklch(15.0% 0.0659 183.8)",
+          "oklch(26.4% 0.0659 183.8)",
+          "oklch(37.9% 0.0659 183.8)",
+          "oklch(49.3% 0.0659 183.8)",
+          "oklch(60.7% 0.0659 183.8)",
+          "oklch(72.1% 0.0659 183.8)",
+          "oklch(83.6% 0.0659 183.8)",
+          "oklch(95.0% 0.0659 183.8)"
         ]
       },
       "accent-hover": {
         "role": "primary",
-        "displayName": "Deep teal hover",
+        "displayName": "Lounge teal hover",
         "tonalRamp": [
-          "oklch(15.0% 0.0663 185.9)",
-          "oklch(26.4% 0.0663 185.9)",
-          "oklch(37.9% 0.0663 185.9)",
-          "oklch(49.3% 0.0663 185.9)",
-          "oklch(60.7% 0.0663 185.9)",
-          "oklch(72.1% 0.0663 185.9)",
-          "oklch(83.6% 0.0663 185.9)",
-          "oklch(95.0% 0.0663 185.9)"
+          "oklch(15.0% 0.0569 183.2)",
+          "oklch(26.4% 0.0569 183.2)",
+          "oklch(37.9% 0.0569 183.2)",
+          "oklch(49.3% 0.0569 183.2)",
+          "oklch(60.7% 0.0569 183.2)",
+          "oklch(72.1% 0.0569 183.2)",
+          "oklch(83.6% 0.0569 183.2)",
+          "oklch(95.0% 0.0569 183.2)"
         ]
       },
       "ink": {
         "role": "neutral",
-        "displayName": "Deep green-black",
+        "displayName": "Deep green ink",
         "tonalRamp": [
-          "oklch(15.0% 0.0224 177.6)",
-          "oklch(26.4% 0.0224 177.6)",
-          "oklch(37.9% 0.0224 177.6)",
-          "oklch(49.3% 0.0224 177.6)",
-          "oklch(60.7% 0.0224 177.6)",
-          "oklch(72.1% 0.0224 177.6)",
-          "oklch(83.6% 0.0224 177.6)",
-          "oklch(95.0% 0.0224 177.6)"
+          "oklch(15.0% 0.0346 175.0)",
+          "oklch(26.4% 0.0346 175.0)",
+          "oklch(37.9% 0.0346 175.0)",
+          "oklch(49.3% 0.0346 175.0)",
+          "oklch(60.7% 0.0346 175.0)",
+          "oklch(72.1% 0.0346 175.0)",
+          "oklch(83.6% 0.0346 175.0)",
+          "oklch(95.0% 0.0346 175.0)"
         ]
       },
       "muted": {
         "role": "neutral",
         "displayName": "Muted green-grey",
         "tonalRamp": [
-          "oklch(15.0% 0.0175 170.5)",
-          "oklch(26.4% 0.0175 170.5)",
-          "oklch(37.9% 0.0175 170.5)",
-          "oklch(49.3% 0.0175 170.5)",
-          "oklch(60.7% 0.0175 170.5)",
-          "oklch(72.1% 0.0175 170.5)",
-          "oklch(83.6% 0.0175 170.5)",
-          "oklch(95.0% 0.0175 170.5)"
+          "oklch(15.0% 0.0237 160.9)",
+          "oklch(26.4% 0.0237 160.9)",
+          "oklch(37.9% 0.0237 160.9)",
+          "oklch(49.3% 0.0237 160.9)",
+          "oklch(60.7% 0.0237 160.9)",
+          "oklch(72.1% 0.0237 160.9)",
+          "oklch(83.6% 0.0237 160.9)",
+          "oklch(95.0% 0.0237 160.9)"
         ]
       },
       "surface": {
@@ -76,58 +76,58 @@
       },
       "canvas": {
         "role": "neutral",
-        "displayName": "Off-white canvas",
+        "displayName": "Light canvas",
         "tonalRamp": [
-          "oklch(15.0% 0.0025 165.1)",
-          "oklch(26.4% 0.0025 165.1)",
-          "oklch(37.9% 0.0025 165.1)",
-          "oklch(49.3% 0.0025 165.1)",
-          "oklch(60.7% 0.0025 165.1)",
-          "oklch(72.1% 0.0025 165.1)",
-          "oklch(83.6% 0.0025 165.1)",
-          "oklch(95.0% 0.0025 165.1)"
+          "oklch(15.0% 0.0057 128.5)",
+          "oklch(26.4% 0.0057 128.5)",
+          "oklch(37.9% 0.0057 128.5)",
+          "oklch(49.3% 0.0057 128.5)",
+          "oklch(60.7% 0.0057 128.5)",
+          "oklch(72.1% 0.0057 128.5)",
+          "oklch(83.6% 0.0057 128.5)",
+          "oklch(95.0% 0.0057 128.5)"
         ]
       },
       "soft": {
         "role": "neutral",
-        "displayName": "Soft green",
+        "displayName": "Sage context",
         "tonalRamp": [
-          "oklch(15.0% 0.0075 164.9)",
-          "oklch(26.4% 0.0075 164.9)",
-          "oklch(37.9% 0.0075 164.9)",
-          "oklch(49.3% 0.0075 164.9)",
-          "oklch(60.7% 0.0075 164.9)",
-          "oklch(72.1% 0.0075 164.9)",
-          "oklch(83.6% 0.0075 164.9)",
-          "oklch(95.0% 0.0075 164.9)"
+          "oklch(15.0% 0.0083 157.1)",
+          "oklch(26.4% 0.0083 157.1)",
+          "oklch(37.9% 0.0083 157.1)",
+          "oklch(49.3% 0.0083 157.1)",
+          "oklch(60.7% 0.0083 157.1)",
+          "oklch(72.1% 0.0083 157.1)",
+          "oklch(83.6% 0.0083 157.1)",
+          "oklch(95.0% 0.0083 157.1)"
         ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Fine separator",
         "tonalRamp": [
-          "oklch(15.0% 0.0067 160.1)",
-          "oklch(26.4% 0.0067 160.1)",
-          "oklch(37.9% 0.0067 160.1)",
-          "oklch(49.3% 0.0067 160.1)",
-          "oklch(60.7% 0.0067 160.1)",
-          "oklch(72.1% 0.0067 160.1)",
-          "oklch(83.6% 0.0067 160.1)",
-          "oklch(95.0% 0.0067 160.1)"
+          "oklch(15.0% 0.0093 150.7)",
+          "oklch(26.4% 0.0093 150.7)",
+          "oklch(37.9% 0.0093 150.7)",
+          "oklch(49.3% 0.0093 150.7)",
+          "oklch(60.7% 0.0093 150.7)",
+          "oklch(72.1% 0.0093 150.7)",
+          "oklch(83.6% 0.0093 150.7)",
+          "oklch(95.0% 0.0093 150.7)"
         ]
       },
       "warning": {
         "role": "status",
-        "displayName": "Warning brown",
+        "displayName": "Warm warning",
         "tonalRamp": [
-          "oklch(15.0% 0.0899 71.8)",
-          "oklch(26.4% 0.0899 71.8)",
-          "oklch(37.9% 0.0899 71.8)",
-          "oklch(49.3% 0.0899 71.8)",
-          "oklch(60.7% 0.0899 71.8)",
-          "oklch(72.1% 0.0899 71.8)",
-          "oklch(83.6% 0.0899 71.8)",
-          "oklch(95.0% 0.0899 71.8)"
+          "oklch(15.0% 0.0878 76.5)",
+          "oklch(26.4% 0.0878 76.5)",
+          "oklch(37.9% 0.0878 76.5)",
+          "oklch(49.3% 0.0878 76.5)",
+          "oklch(60.7% 0.0878 76.5)",
+          "oklch(72.1% 0.0878 76.5)",
+          "oklch(83.6% 0.0878 76.5)",
+          "oklch(95.0% 0.0878 76.5)"
         ]
       },
       "warning-bg": {
@@ -172,6 +172,20 @@
           "oklch(95.0% 0.0814 164.4)"
         ]
       },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Field border",
+        "tonalRamp": [
+          "oklch(15.0% 0.0178 153.5)",
+          "oklch(26.4% 0.0178 153.5)",
+          "oklch(37.9% 0.0178 153.5)",
+          "oklch(49.3% 0.0178 153.5)",
+          "oklch(60.7% 0.0178 153.5)",
+          "oklch(72.1% 0.0178 153.5)",
+          "oklch(83.6% 0.0178 153.5)",
+          "oklch(95.0% 0.0178 153.5)"
+        ]
+      },
       "control-border": {
         "role": "neutral",
         "displayName": "Control border",
@@ -186,29 +200,39 @@
           "oklch(95.0% 0.0161 154.4)"
         ]
       },
+      "sheet-surface": {
+        "role": "neutral",
+        "displayName": "Sheet white",
+        "tonalRamp": [
+          "oklch(15.0% 0.0017 145.6)",
+          "oklch(26.4% 0.0017 145.6)",
+          "oklch(37.9% 0.0017 145.6)",
+          "oklch(49.3% 0.0017 145.6)",
+          "oklch(60.7% 0.0017 145.6)",
+          "oklch(72.1% 0.0017 145.6)",
+          "oklch(83.6% 0.0017 145.6)",
+          "oklch(95.0% 0.0017 145.6)"
+        ]
+      },
       "preview-background": {
         "role": "neutral",
         "displayName": "Desktop surround",
         "tonalRamp": [
-          "oklch(15.0% 0.0050 165.0)",
-          "oklch(26.4% 0.0050 165.0)",
-          "oklch(37.9% 0.0050 165.0)",
-          "oklch(49.3% 0.0050 165.0)",
-          "oklch(60.7% 0.0050 165.0)",
-          "oklch(72.1% 0.0050 165.0)",
-          "oklch(83.6% 0.0050 165.0)",
-          "oklch(95.0% 0.0050 165.0)"
+          "oklch(15.0% 0.0086 128.6)",
+          "oklch(26.4% 0.0086 128.6)",
+          "oklch(37.9% 0.0086 128.6)",
+          "oklch(49.3% 0.0086 128.6)",
+          "oklch(60.7% 0.0086 128.6)",
+          "oklch(72.1% 0.0086 128.6)",
+          "oklch(83.6% 0.0086 128.6)",
+          "oklch(95.0% 0.0086 128.6)"
         ]
       }
     },
     "typographyMeta": {
-      "headline": {
-        "displayName": "Planner title",
-        "purpose": "Main itinerary navigation title."
-      },
       "title": {
-        "displayName": "Task title",
-        "purpose": "Assistant and shared sheet headings."
+        "displayName": "Screen and sheet title",
+        "purpose": "Primary headings for planner, assistant and task sheets."
       },
       "section": {
         "displayName": "Section heading",
@@ -216,23 +240,27 @@
       },
       "activity": {
         "displayName": "Activity title",
-        "purpose": "Readable timeline activity names."
+        "purpose": "Timeline and available-service names."
       },
       "body": {
         "displayName": "Interface body",
-        "purpose": "Default interface content."
+        "purpose": "Default operational content."
       },
       "conversation": {
         "displayName": "Conversation body",
-        "purpose": "Message reading text."
+        "purpose": "Assistant and user message reading text."
       },
       "label": {
         "displayName": "Supporting label",
-        "purpose": "Secondary context and state text."
+        "purpose": "Flight and other supporting context."
       },
       "field": {
-        "displayName": "Form field",
-        "purpose": "Native input/select text in labelled task fields."
+        "displayName": "Native form field",
+        "purpose": "Labelled task input and select text."
+      },
+      "navigation": {
+        "displayName": "Tab label",
+        "purpose": "Small icon-over-label navigation text; current page is semibold."
       }
     },
     "shadows": [
@@ -244,34 +272,44 @@
       {
         "name": "booking-selected",
         "value": "0 1px 3px #173d2810",
-        "purpose": "Selected booking segment against the navigation track."
+        "purpose": "Selected booking segment against its canvas track."
       }
     ],
     "motion": [
       {
         "name": "ease",
         "value": "cubic-bezier(.22, 1, .36, 1)",
-        "purpose": "Transform easing for controls, sheet entry and toast."
+        "purpose": "Transform easing for control, screen, sheet and toast motion."
       },
       {
         "name": "control-duration",
         "value": "160ms",
-        "purpose": "Control background, border, text and transform transitions."
+        "purpose": "Control background, border, color and transform transitions."
       },
       {
-        "name": "sheet-entry-duration",
-        "value": "220ms",
-        "purpose": "Sheet opacity and 16px entry offset."
+        "name": "press-scale",
+        "value": "scale(.98)",
+        "purpose": "Immediate press feedback on eligible buttons and activity summaries."
       },
       {
-        "name": "toast-duration",
-        "value": "180ms",
-        "purpose": "Toast opacity and 8px offset transition."
+        "name": "screen-entry",
+        "value": "220ms; opacity .7 → 1; translateX(8px) → 0",
+        "purpose": "Short directional entry of an activated screen."
+      },
+      {
+        "name": "sheet-entry",
+        "value": "280ms; opacity .6 → 1; translateY(28px) → 0",
+        "purpose": "Native bottom-sheet presentation."
+      },
+      {
+        "name": "toast-transition",
+        "value": "180ms; opacity 0 → 1; translateY(8px) → 0",
+        "purpose": "Transient status feedback above the active fixed controls."
       },
       {
         "name": "reduced-motion",
-        "value": "none",
-        "purpose": "Reduced-motion media query removes transitions and animation."
+        "value": "animation: none; transition: none; scroll-behavior: auto",
+        "purpose": "Reduced-motion media query removes animated movement."
       }
     ],
     "breakpoints": [
@@ -290,69 +328,126 @@
       "name": "Sheet primary action",
       "kind": "button",
       "refersTo": "button-sheet-primary",
-      "description": "Full-width task confirmation, with the existing approval behavior kept in the application.",
+      "description": "Full-width teal confirmation used in native task sheets.",
       "html": "<button type=\"button\" class=\"ds-sheet-primary\">保存活動</button>",
-      "css": ".ds-sheet-primary{width:100%;min-height:48px;margin-top:14px;padding:11px 16px;border:0;border-radius:var(--radius,10px);background:var(--accent,#00645d);color:var(--surface,#ffffff);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:15px;font-weight:500;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-sheet-primary:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}.ds-sheet-primary:active:not(:disabled){transform:scale(.98)}.ds-sheet-primary:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-sheet-primary:hover{background:var(--accent-hover,#004d47)}}"
+      "css": ".ds-sheet-primary{width:100%;min-height:50px;margin-top:16px;padding:12px 16px;border:0;border-radius:13px;background:var(--accent,#23635b);color:var(--surface,#ffffff);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:15px;font-weight:600;line-height:1.55;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-sheet-primary:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-sheet-primary:active:not(:disabled){transform:scale(.98)}.ds-sheet-primary:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-sheet-primary:hover:not(:disabled){background:var(--accent-hover,#1b5049)}}@media(prefers-reduced-motion:reduce){.ds-sheet-primary{transition:none}}"
+    },
+    {
+      "name": "Booking secondary action",
+      "kind": "button",
+      "refersTo": "button-booking-secondary",
+      "description": "Outlined task action used beside filled booking confirmations.",
+      "html": "<button type=\"button\" class=\"ds-booking-secondary\">查看候補</button>",
+      "css": ".ds-booking-secondary{min-height:44px;max-width:100%;padding:9px 12px;border:1px solid #d0dbd3;border-radius:8px;background:var(--surface,#ffffff);color:var(--accent,#23635b);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:13px;font-weight:400;line-height:1.6;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-booking-secondary:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-booking-secondary:active:not(:disabled){transform:scale(.98)}.ds-booking-secondary:disabled{opacity:.45;cursor:default}@media(prefers-reduced-motion:reduce){.ds-booking-secondary{transition:none}}"
+    },
+    {
+      "name": "Quiet text action",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Low-emphasis contextual action for sorting or viewing more.",
+      "html": "<button type=\"button\" class=\"ds-text-action\">重新排序</button>",
+      "css": ".ds-text-action{display:inline-flex;align-items:center;justify-content:flex-end;min-height:44px;padding:6px 0 6px 8px;border:0;border-radius:6px;background:transparent;color:var(--accent,#23635b);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:12px;font-weight:400;line-height:1.55;white-space:nowrap;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-text-action:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-text-action:active:not(:disabled){transform:scale(.98)}.ds-text-action:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-text-action:hover:not(:disabled){background:var(--soft,#edf3ef)}}@media(prefers-reduced-motion:reduce){.ds-text-action{transition:none}}"
     },
     {
       "name": "Native form field",
       "kind": "input",
       "refersTo": "field",
-      "description": "Label and native control used in shared task sheets.",
-      "html": "<label class=\"ds-field\">開始時間<input type=\"time\" value=\"17:30\"></label>",
-      "css": ".ds-field{display:flex;flex-direction:column;gap:7px;margin:18px 0;color:var(--ink,#23332f);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:13px;font-weight:500}.ds-field input{width:100%;min-width:0;min-height:48px;padding:11px 12px;border:1px solid #d0dbd3;border-radius:8px;background:var(--surface,#ffffff);color:var(--ink,#23332f);font:inherit;font-size:16px;caret-color:var(--accent,#00645d);transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-field input:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}"
+      "description": "Labelled native input used by activity, time and incident sheets.",
+      "html": "<label class=\"ds-field\">開始時間<input class=\"ds-field-control\" type=\"time\" value=\"17:30\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:7px;margin:18px 0;color:var(--ink,#213b34);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:13px;font-weight:500;line-height:1.55}.ds-field-control{width:100%;min-width:0;min-height:50px;padding:12px 13px;border:1px solid #cbd7ce;border-radius:12px;background:var(--surface,#ffffff);color:var(--ink,#213b34);font:inherit;font-size:16px;caret-color:var(--accent,#23635b);transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-field-control:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}@media(prefers-reduced-motion:reduce){.ds-field-control{transition:none}}"
+    },
+    {
+      "name": "Shared app navigation",
+      "kind": "nav",
+      "refersTo": "app-navigation",
+      "description": "The same three items and current-page treatment on both screens.",
+      "html": "<nav class=\"ds-tabbar\" aria-label=\"主要導航\"><button class=\"ds-tab\" type=\"button\" aria-current=\"page\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg><span>我的行程</span></button><button class=\"ds-tab\" type=\"button\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"19\" height=\"19\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 1 2.4 8.6L23 12l-8.6 2.4L12 23l-2.4-8.6L1 12l8.6-2.4L12 1Z\"/></svg><span>智能助手</span></button><button class=\"ds-tab\" type=\"button\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 3 10 18H2L12 3Zm0 7v4m0 3h.01\"/></svg><span>突發修改</span></button></nav>",
+      "css": ".ds-tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:8px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line,#e2e8e3);background:var(--surface,#ffffff)}.ds-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:50px;padding:3px 0;border:0;border-radius:12px;background:transparent;color:var(--muted,#627269);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:11px;font-weight:400;line-height:1.4;white-space:nowrap;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-tab svg{width:22px;height:22px}.ds-tab[aria-current=\"page\"]{color:var(--accent,#23635b);font-weight:600}.ds-tab[aria-current=\"page\"] svg{stroke-width:1.8}.ds-tab:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-tab:active:not(:disabled){transform:scale(.98)}.ds-tab:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-tab:hover:not(:disabled){background:var(--soft,#edf3ef)}}@media(prefers-reduced-motion:reduce){.ds-tab{transition:none}}"
     },
     {
       "name": "Booking view navigation",
       "kind": "nav",
       "refersTo": "booking-navigation",
-      "description": "Three distinct booking views with a selected white segment.",
-      "html": "<nav class=\"ds-booking-tabs\" aria-label=\"預約分類\"><button type=\"button\" aria-pressed=\"true\">可選時段</button><button type=\"button\" aria-pressed=\"false\">我的預約</button><button type=\"button\" aria-pressed=\"false\">我的候補</button></nav>",
-      "css": ".ds-booking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;margin:12px 0 18px;border-radius:9px;background:var(--canvas,#f5f7f6)}.ds-booking-tabs button{min-width:0;min-height:42px;padding:7px 3px;border:0;border-radius:6px;background:transparent;color:var(--muted,#63706b);font-family:var(--font-ui,\"Lounge Sans TC\",-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"Microsoft JhengHei\",sans-serif);font-weight:400;line-height:1.6;font-size:13px;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-booking-tabs button[aria-pressed=true]{background:var(--surface,#ffffff);color:var(--ink,#23332f);box-shadow:0 1px 3px #173d2810}.ds-booking-tabs button:focus-visible{outline:2px solid var(--accent,#00645d);outline-offset:3px}.ds-booking-tabs button:active:not(:disabled){transform:scale(.98)}.ds-booking-tabs button:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-booking-tabs button:hover{color:var(--ink,#23332f)}}"
+      "description": "Separate segmented selection for available slots, reservations and waitlist.",
+      "html": "<nav class=\"ds-booking-tabs\" aria-label=\"預約分類\"><button class=\"ds-booking-tab\" type=\"button\" aria-pressed=\"true\">可選時段</button><button class=\"ds-booking-tab\" type=\"button\" aria-pressed=\"false\">我的預約</button><button class=\"ds-booking-tab\" type=\"button\" aria-pressed=\"false\">我的候補</button></nav>",
+      "css": ".ds-booking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;margin:12px 0 18px;border-radius:9px;background:var(--canvas,#f4f6f2)}.ds-booking-tab{min-width:0;min-height:44px;padding:7px 3px;border:0;border-radius:6px;background:transparent;color:var(--muted,#627269);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:13px;font-weight:400;line-height:1.55;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-booking-tab[aria-pressed=\"true\"]{background:var(--surface,#ffffff);color:var(--ink,#213b34);box-shadow:0 1px 3px #173d2810}.ds-booking-tab:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-booking-tab:active:not(:disabled){transform:scale(.98)}.ds-booking-tab:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-booking-tab:hover:not(:disabled){color:var(--ink,#213b34)}}@media(prefers-reduced-motion:reduce){.ds-booking-tab{transition:none}}"
+    },
+    {
+      "name": "Proposal change tag",
+      "kind": "chip",
+      "refersTo": "proposal-tag",
+      "description": "Non-interactive labels describe changes in a proposal preview.",
+      "html": "<div class=\"ds-tags\"><span class=\"ds-tag\">更改 · 18:05 → 18:10 用餐</span><span class=\"ds-tag\">新增 · 18:40 休息</span></div>",
+      "css": ".ds-tags{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}.ds-tag{padding:3px 6px;border-radius:4px;background:var(--soft,#edf3ef);color:var(--accent,#23635b);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:11px;font-weight:400;line-height:1.55}"
+    },
+    {
+      "name": "Assistant and user messages",
+      "kind": "card",
+      "refersTo": "assistant-reply",
+      "description": "Framed white assistant replies with the original mark; sage user messages.",
+      "html": "<div class=\"ds-conversation\"><div class=\"ds-agent-message\"><span class=\"ds-avatar\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"19\" height=\"19\" fill=\"currentColor\" stroke=\"none\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 1 2.4 8.6L23 12l-8.6 2.4L12 23l-2.4-8.6L1 12l8.6-2.4L12 1Z\"/></svg></span><div class=\"ds-reply\"><p class=\"ds-message-copy\">請檢查建議行程，確認後才保存。</p><time class=\"ds-message-time\">17:30</time></div></div><div class=\"ds-user-message\"><p class=\"ds-message-copy\">這樣來得及登機嗎？</p><time class=\"ds-message-time\">17:31</time></div></div>",
+      "css": ".ds-conversation{display:flex;flex-direction:column;gap:18px;padding:16px 20px 22px;background:var(--canvas,#f4f6f2);color:var(--ink,#213b34);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:15px;line-height:1.65}.ds-agent-message{display:flex;align-items:flex-start;gap:8px;max-width:100%}.ds-avatar{display:grid;place-items:center;flex:none;width:20px;height:28px;margin-top:9px;color:var(--accent,#23635b)}.ds-reply{min-width:0;padding:14px 16px;border:1px solid var(--line,#e2e8e3);border-radius:16px;background:var(--surface,#ffffff);overflow-wrap:anywhere}.ds-user-message{align-self:flex-end;max-width:88%;padding:12px 15px;border-radius:16px;background:var(--soft,#edf3ef);overflow-wrap:anywhere}.ds-message-copy{margin:0}.ds-message-time{display:block;margin-top:5px;color:var(--muted,#627269);font-size:11px;text-align:right}.ds-reply>.ds-message-time{text-align:left}"
+    },
+    {
+      "name": "Open timeline activity",
+      "kind": "custom",
+      "refersTo": "activity-menu",
+      "description": "Text-led activity with native details menu, explicit state and time column.",
+      "html": "<article class=\"ds-activity\"><div class=\"ds-time\"><strong>17:30</strong><span>18:00</span></div><span class=\"ds-dot\" aria-hidden=\"true\"></span><div class=\"ds-activity-detail\"><strong>淋浴</strong><small>寰宇堂 · 淋浴間</small><span class=\"ds-status\">示範已確認</span></div><details class=\"ds-menu\"><summary class=\"ds-menu-trigger\" aria-label=\"管理淋浴\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"19\" height=\"19\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"5\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/></svg></summary><div class=\"ds-menu-items\"><button class=\"ds-menu-action\" type=\"button\">編輯</button><button class=\"ds-menu-action ds-menu-delete\" type=\"button\">移除活動</button></div></details></article>",
+      "css": ".ds-activity{position:relative;display:grid;grid-template-columns:62px 10px minmax(0,1fr) 28px;align-items:start;column-gap:14px;min-height:94px;padding:14px 0 15px;color:var(--ink,#213b34);background:var(--surface,#ffffff);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);line-height:1.55}.ds-time{padding-top:1px;color:var(--muted,#627269);font-size:12px;line-height:1.65}.ds-time strong{display:block;color:var(--ink,#213b34);font-size:16px;font-weight:600}.ds-time>span{display:block;padding-top:2px}.ds-dot{display:block;width:8px;height:8px;margin:8px 0 0 1px;border-radius:50%;background:var(--accent,#23635b)}.ds-activity-detail{min-width:0}.ds-activity-detail>strong{font-size:16px;line-height:1.5;font-weight:600;overflow-wrap:anywhere}.ds-activity-detail>small{display:block;margin-top:5px;color:var(--muted,#627269);font-size:11px;line-height:1.6}.ds-status{display:block;margin-top:4px;color:var(--accent,#23635b);font-size:12px;line-height:1.5}.ds-menu{position:relative;z-index:2}.ds-menu[open]{z-index:5}.ds-menu-trigger{display:grid;place-items:center;width:44px;height:44px;margin:-8px -8px 0 0;list-style:none;border-radius:50%;cursor:pointer;color:var(--muted,#627269);transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-menu-trigger::-webkit-details-marker{display:none}.ds-menu-items{position:absolute;top:37px;right:0;display:grid;min-width:148px;padding:5px;background:var(--surface,#ffffff);border-radius:12px;box-shadow:0 5px 26px #173d2821}.ds-menu-action{display:flex;align-items:center;width:100%;min-height:44px;padding:9px 12px;border:0;border-radius:7px;background:transparent;color:var(--ink,#213b34);text-align:left;font:inherit;font-size:14px;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-menu-delete{color:var(--error,#a83c32)}.ds-menu-trigger:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-menu-trigger:active:not(:disabled){transform:scale(.98)}.ds-menu-trigger:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-menu-trigger:hover:not(:disabled){background:var(--soft,#edf3ef)}}@media(prefers-reduced-motion:reduce){.ds-menu-trigger{transition:none}}.ds-menu-action:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-menu-action:active:not(:disabled){transform:scale(.98)}.ds-menu-action:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-menu-action:hover:not(:disabled){background:var(--soft,#edf3ef)}}@media(prefers-reduced-motion:reduce){.ds-menu-action{transition:none}}@media(max-width:360px){.ds-activity{grid-template-columns:49px 8px minmax(0,1fr) 26px;column-gap:9px}.ds-activity-detail>strong{font-size:15px}}"
+    },
+    {
+      "name": "Voice and text composer",
+      "kind": "custom",
+      "refersTo": "composer",
+      "description": "One capsule with focus-within border, microphone state and send control.",
+      "html": "<div class=\"ds-composer\"><div class=\"ds-composer-row\"><input class=\"ds-request\" aria-label=\"輸入訊息\" placeholder=\"想如何安排接下來的時間？\"><button class=\"ds-mic\" type=\"button\" aria-label=\"開始語音輸入\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"19\" height=\"19\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\"/><path d=\"M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8\"/></svg></button><button class=\"ds-send\" type=\"button\" aria-label=\"發送訊息\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"19\" height=\"19\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.55\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 19V5m-6 6 6-6 6 6\"/></svg></button></div></div>",
+      "css": ".ds-composer{padding:4px 18px 12px;background:var(--canvas,#f4f6f2)}.ds-composer-row{display:flex;align-items:center;gap:2px;padding:4px 5px 4px 16px;border:1px solid var(--line,#e2e8e3);border-radius:28px;background:var(--surface,#ffffff)}.ds-composer-row:focus-within{border-color:var(--accent,#23635b)}.ds-request{flex:1;min-width:0;min-height:44px;padding:8px 0;border:0;border-radius:0;outline:none;background:transparent;color:var(--ink,#213b34);font-family:var(--font-ui,-apple-system,BlinkMacSystemFont,\"PingFang TC\",\"PingFang SC\",\"Lounge Sans TC\",\"Microsoft JhengHei\",sans-serif);font-size:16px;font-weight:400;line-height:1.5;caret-color:var(--accent,#23635b);transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-request::placeholder{color:var(--muted,#627269);font-size:14px}.ds-request:focus-visible{outline:none}.ds-mic,.ds-send{display:grid;place-items:center;flex:none;width:44px;height:44px;padding:0;border:0;border-radius:22px;background:transparent;color:var(--accent,#23635b);cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 160ms var(--ease,cubic-bezier(.22,1,.36,1));}.ds-send{background:var(--accent,#23635b);color:var(--surface,#ffffff)}.ds-mic.ds-listening{background:var(--soft,#edf3ef)}.ds-mic:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-mic:active:not(:disabled){transform:scale(.98)}.ds-mic:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-mic:hover:not(:disabled){background:var(--soft,#edf3ef)}}@media(prefers-reduced-motion:reduce){.ds-mic{transition:none}}.ds-send:focus-visible{outline:2px solid var(--accent,#23635b);outline-offset:3px}.ds-send:active:not(:disabled){transform:scale(.98)}.ds-send:disabled{opacity:.45;cursor:default}@media(hover:hover) and (pointer:fine){.ds-send:hover:not(:disabled){background:var(--accent-hover,#1b5049)}}@media(prefers-reduced-motion:reduce){.ds-send{transition:none}}@media(prefers-reduced-motion:reduce){.ds-request{transition:none}}"
     }
   ],
   "narrative": {
-    "northStar": "A familiar lounge itinerary",
-    "overview": "This mobile travel tool uses Operate mode: a traveller should understand the available time, current activities and next action without decoding a dashboard. The approved direction follows the restrained white surfaces, dark teal actions and clear flight information in [Cathay Pacific's official App Store screenshots](https://apps.apple.com/us/app/cathay-pacific/id305038764). It remains a hackathon prototype without official branding or a claim of affiliation.\n\nThis refresh records the implemented system in styles.css, index.html, app.js and reservation-ui.js. It includes compact flight context, a simpler timeline, native activity menus, a text-only itinerary and illustrated service rows, separate booking views and a local Traditional Chinese font. The follow-up restores the original four-point assistant mark, adds softly tinted conversation space with framed AI replies, and aligns the planner footer with the assistant toolbar. It supersedes the previous claim that the branch differs only in CSS and theme-color metadata. Reservation integration retains its recorded provenance in Ray's upstream commit 5abcd8f81884fc8f58acf7c18181bfe58368ac37; presentation changes do not redefine its API, approval or business rules.",
+    "northStar": "The lounge from the films",
+    "overview": "Bring the user-selected pitch-clips-v3 appearance into an interactive travel tool. White and light sage surfaces, dark teal controls and system-first typography create a quiet, familiar mobile hierarchy. Compact travel context gives time, activity and booking state their own clear places.\n\nThe interface favors open reading over decorative framing: the itinerary is text-led, while authentic Cathay photographs appear in available-service rows. The original four-point assistant mark and framed white replies give conversations continuity with the films. Product behavior and approval boundaries remain governed by PRODUCT.md; imagery does not imply official integration, eligibility or live inventory.",
     "keyCharacteristics": [
-      "White reading surfaces with restrained teal actions and explicit state text.",
-      "Local Lounge Sans TC for the bundled interface, with system fallback for missing glyphs.",
-      "Compact flight context, a readable timeline and flat service rows.",
-      "Native disclosure for activity actions and inventory diagnostics.",
-      "Fixed planning actions and conversation input, with independently scrolling content."
+      "White and sage surfaces with a restrained dark teal action color.",
+      "System-first typography, tabular times and explicit booking state text.",
+      "Compact flight context, an open timeline and authentic service photographs.",
+      "One shared three-item tab bar, with save and time controls beside the plan.",
+      "Framed assistant replies, sage user messages and a compact voice/text composer."
     ],
     "rules": [
       {
         "name": "The State With Text Rule",
-        "body": "Confirmed, pending, offered and expired states retain readable labels; color never stands in for the booking state or approval requirement.",
+        "body": "Confirmed, pending, offered and expired states retain readable labels; color never stands in for booking state or approval.",
         "section": "colors"
       },
       {
-        "name": "The One Interface Typeface Rule",
-        "body": "Keep operational headings, forms and messages in the bundled interface family and its fallback stack; do not introduce a decorative display pairing or synthesize unprovided weights.",
+        "name": "The System First Rule",
+        "body": "Keep headings, forms and messages in the existing system-first stack. The local Lounge Sans TC subset is a fallback, not the primary visual identity.",
         "section": "typography"
       },
       {
-        "name": "The Flat Except Overlays Rule",
-        "body": "Keep ordinary activity and service content flat; use the existing menu and selected-segment shadows only for those specific layers.",
+        "name": "The Flat Reading Rule",
+        "body": "Keep timeline and service rows flat. Reserve the existing shadows for the open activity menu and selected booking segment.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** keep flight context compact and give the actual itinerary the main reading space.",
-      "**Do** use the bundled interface font with its explicit fallback stack and tabular time values.",
-      "**Do** use flat service rows, clear separators and native disclosure for secondary actions.",
-      "**Do** preserve all five quick actions, native controls and keyboard focus.",
-      "**Do** keep booking state, demonstration labels and confirmation requirements explicit.",
-      "**Do** preserve existing API, approval, reservation, timing and recovery rules when changing presentation."
+      "**Do** carry the user-selected films through white and sage surfaces, teal controls and the compact mobile hierarchy.",
+      "**Do** keep time, activity, location and booking state distinct in the text-led timeline.",
+      "**Do** use the same three tab-bar labels and selected treatment on planner and assistant screens.",
+      "**Do** preserve all five assistant capabilities through the three quick actions and the itinerary and incident navigation controls.",
+      "**Do** use the official photo files with descriptive alternatives, visible attribution and the existing provenance manifest.",
+      "**Do** retain native fields, visible keyboard focus, safe-area spacing and the reduced-motion fallback.",
+      "**Do** keep demonstration labels and proposal confirmation requirements explicit."
     ],
     "donts": [
-      "**Don't** reintroduce decorative hero photography, fake device status chrome, section slogans or nested discovery cards.",
-      "**Don't** treat a pending proposal, queue entry or offered slot as an approved reservation.",
-      "**Don't** present SQLite demo inventory or a simulated flight as live Cathay data.",
-      "**Don't** add a display font, synthetic font weight or a claim of complete CJK coverage.",
-      "**Don't** generalize current smaller target exceptions or hidden legacy decorative symbols into component defaults.",
-      "**Don't** apply overlay shadows to every list row or plain container."
+      "**Don't** replace the selected visual world with the earlier bundled-font-first theme or generated lounge images.",
+      "**Don't** put photographs into the itinerary or add decorative hero imagery, fake device status chrome or an unofficial airline logo.",
+      "**Don't** turn save, time management or waitlist controls into persistent navigation destinations.",
+      "**Don't** hide booking state behind color, or present a pending proposal, waitlist entry or offered slot as an approved reservation.",
+      "**Don't** infer service eligibility, inventory or reservation rules from the photographed lounge.",
+      "**Don't** add decorative shadows to ordinary rows or animate continuously around operational content."
     ]
   }
 }

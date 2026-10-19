@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#f4f6f2">
   <title>貴賓室智能行程</title>
   <link rel="preload" href="./assets/fonts/lounge-sans-tc.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
@@ -15,7 +15,7 @@
   <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 1 2.4 8.6L23 12l-8.6 2.4L12 23l-2.4-8.6L1 12l8.6-2.4L12 1Z"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 2 2 5-5"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-  <symbol id="i-list" viewBox="0 0 24 24"><path d="m3 6 2 2 3-3M11 7h10M3 14l2 2 3-3m3 2h10M3 21l2 2 3-3m3 2h10"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
   <symbol id="i-shower" viewBox="0 0 24 24"><path d="M5 12V8a6 6 0 0 1 12 0v1M12 9h8v4h-8zM13 17v2m4-2v3m4-3v2M3 17v2m4-2v3"/></symbol>
   <symbol id="i-dining" viewBox="0 0 24 24"><path d="M4 2v9m3-9v9m3-9v9M4 11h6m-3 0v11M17 2c-3 3-3 9 0 11h3V2h-3Zm1 11v9"/></symbol>
   <symbol id="i-spa" viewBox="0 0 24 24"><path d="M12 20c-5-3-7-7-7-11 4 0 6 2 7 5 1-3 3-5 7-5 0 4-2 8-7 11ZM12 14C9 11 9 7 12 3c3 4 3 8 0 11ZM5 13c-2-1-3-1-4-1 1 5 5 8 11 8m7-7c2-1 3-1 4-1-1 5-5 8-11 8"/></symbol>
@@ -29,7 +29,7 @@
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 1 6M20 3v5h-5"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3Zm0 7v4m0 3h.01"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></symbol>
-  <symbol id="i-send" viewBox="0 0 24 24"><path d="m21 3-7 18-3.5-7.5L3 10l18-7ZM10.5 13.5 21 3"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10Zm-8 13h4"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
   <symbol id="i-arrows" viewBox="0 0 24 24"><path d="m7 3-4 4 4 4M3 7h14m0 14 4-4-4-4m4 4H7"/></symbol>
@@ -39,30 +39,29 @@
   <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 14 6-6 6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 10 6 6 6-6"/></symbol>
 </svg>
-<div class="ambient" aria-hidden="true"></div>
 <main class="phone" aria-label="貴賓室智能行程互動原型">
-  <div class="statusbar" aria-hidden="true"><strong>9:41</strong><span class="system-icons">▂▄▆　◕　▰</span></div>
   <section id="plannerScreen" class="screen active" aria-label="我的貴賓室行程">
     <header class="planner-hero">
       <div class="hero-image"></div>
       <div class="hero-content">
         <div class="page-navigation"><h1>貴賓室行程</h1><button id="openAgent" class="agent-launch" type="button" aria-label="開啟智能助手"><svg><use href="#i-spark"/></svg><span>智能助手</span><svg class="launch-chevron"><use href="#i-chevron"/></svg></button></div>
-        <div class="flight-title"><button class="back-button" type="button" aria-label="返回" data-action="back" hidden><svg><use href="#i-back"/></svg></button><div><span class="flight-code">CX251 <span>→</span> 倫敦希斯路</span><p>登機 <b data-boarding-time>19:20</b><i></i> 登機口 <b id="plannerGate">25</b></p></div><span class="demo-label">示範航班</span></div>
+        <div class="flight-title"><button class="back-button" type="button" aria-label="返回" data-action="back" hidden><svg><use href="#i-back"/></svg></button><div><span class="flight-code"><span class="flight-number">CX251</span><span class="flight-destination">→ 倫敦希斯路</span></span><p>登機 <b data-boarding-time>19:20</b><i></i> 登機口 <b id="plannerGate">25</b></p></div><span class="demo-label">示範航班</span></div>
         <div class="hero-lower"><span><svg><use href="#i-clock"/></svg> 可用休息時間 <strong id="heroDuration">1小時45分</strong></span><small id="heroWindow">17:30 — 19:15</small></div>
       </div>
     </header>
     <div class="planner-content">
       <p id="siteModeNotice" class="site-mode-notice" role="status" hidden>网页演示 · 行程保存在当前设备；预约、突发恢复与 AI 需使用完整服务。</p>
       <section class="overview" aria-label="行程概覽"><div class="overview-main"><small>可用時間</small><strong id="overviewDuration">1小時45分</strong><span id="overviewWindow">17:30 – 19:15</span></div><button id="changeArrival" class="arrival-link" type="button" aria-label="修改到達時間">修改<svg><use href="#i-chevron"/></svg></button><p id="remainingText">還可探索更多服務</p></section>
-      <section class="schedule" aria-labelledby="scheduleTitle"><div class="section-head"><div class="section-title"><h2 id="scheduleTitle">我的行程</h2><span class="section-count"><span id="activityCount">3</span> 項活動</span></div><button id="reorderButton" class="tiny-button" type="button"><svg><use href="#i-arrows"/></svg> 重新排序</button></div><div id="planWarnings" class="warning" hidden></div><div id="bookingNotice" class="warning" hidden></div><div id="activityList" class="timeline"></div><div class="boarding-strip"><div><svg><use href="#i-plane"/></svg><strong>登機 <span data-boarding-time>19:20</span></strong><span>登機口 <b id="stripGate">25</b></span></div><button id="changeBoarding" type="button">修改</button></div><p id="boardingRecommendation" class="boarding-recommendation"></p></section>
-      <section class="discover" aria-labelledby="discoverTitle"><div class="section-head"><div class="section-title"><h2 id="discoverTitle">可添加行程</h2></div><button id="viewAll" class="link-button" type="button">查看全部 <svg><use href="#i-chevron"/></svg></button></div><div id="serviceList" class="service-list"></div></section>
+      <section class="schedule" aria-labelledby="scheduleTitle"><div class="section-head"><div class="section-title"><h2 id="scheduleTitle">我的行程</h2><span class="section-count"><span id="activityCount">3</span> 項活動</span></div><button id="reorderButton" class="tiny-button" type="button"><svg><use href="#i-arrows"/></svg> 重新排序</button></div><div id="planWarnings" class="warning" hidden></div><div id="bookingNotice" class="warning" hidden></div><div id="activityList" class="timeline"></div><div class="boarding-strip"><div><svg><use href="#i-plane"/></svg><strong>登機 <span data-boarding-time>19:20</span></strong><span>登機口 <b id="stripGate">25</b></span></div><button id="changeBoarding" type="button">修改</button></div><p id="boardingRecommendation" class="boarding-recommendation"></p><div class="plan-management" aria-label="行程操作"><button id="changeTime" type="button"><svg><use href="#i-clock"/></svg><span>修改時間</span></button><button id="viewWaitlist" type="button"><svg><use href="#i-bell"/></svg><span>查看候補</span></button><button id="savePlan" class="primary" type="button"><svg><use href="#i-check"/></svg><span>保存行程</span></button></div></section>
+      <section class="discover" aria-labelledby="discoverTitle"><div class="section-head"><div class="section-title"><h2 id="discoverTitle">可添加行程</h2></div><button id="viewAll" class="link-button" type="button">查看全部 <svg><use href="#i-chevron"/></svg></button></div><div id="serviceList" class="service-list"></div><p class="photo-credit">國泰貴賓室官方實景 · <a href="https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-pier-first.html" target="_blank" rel="noopener noreferrer">玉衡堂</a> / <a href="https://www.cathaypacific.com/cx/en_HK/destinations/lounges/hong-kong-hkg/the-wing-first.html" target="_blank" rel="noopener noreferrer">寰宇堂</a></p></section>
     </div>
-    <footer class="planner-actions" aria-label="行程操作"><button id="changeTime" type="button"><svg><use href="#i-clock"/></svg><span>修改時間</span></button><button id="savePlan" class="primary" type="button"><svg><use href="#i-check"/></svg><span>保存行程</span></button><button id="viewWaitlist" type="button"><svg><use href="#i-bell"/></svg><span>查看候補</span></button></footer>
+    <nav class="app-tabbar" aria-label="主要導航"><button type="button" data-quick="view" aria-current="page"><svg><use href="#i-list"/></svg><span>我的行程</span></button><button type="button" data-open-agent><svg><use href="#i-spark"/></svg><span>智能助手</span></button><button type="button" data-quick="incident"><svg><use href="#i-alert"/></svg><span>突發修改</span></button></nav>
   </section>
   <section id="agentScreen" class="screen agent-screen" aria-label="智能助手對話">
     <header class="agent-header"><div class="agent-top"><button id="backToPlanner" class="back-button" type="button" aria-label="返回行程"><svg><use href="#i-back"/></svg></button><div><h1>智能助手</h1><p>CX251 · 倫敦希斯路<i></i>登機 <b data-boarding-time>19:20</b> · G<b id="agentGate">25</b></p><p class="agent-time">可用時間 <strong id="agentDuration">1小時45分鐘</strong></p></div></div><button id="planPreview" class="plan-preview" type="button"><span class="preview-title"><b>目前行程</b></span><span id="previewStatus" class="green-pill">已安排</span><svg class="preview-chevron"><use href="#i-chevron"/></svg><div id="miniTimeline" class="mini-timeline"></div></button><div class="agent-presence"><b id="agentModeLabel">演示模式 · 未連接 AI</b><span></span></div><a id="liveModeLink" class="demo-link" href="http://127.0.0.1:8765/" hidden>目前是演示頁面，點此開啟本機 AI →</a></header>
     <div id="chatLog" class="chat-log" aria-live="polite"></div>
-    <div class="composer"><div class="composer-row"><input id="requestInput" aria-label="輸入訊息" placeholder="想如何安排接下來的時間？"><button id="micButton" class="mic-button" type="button" aria-label="開始語音輸入"><svg><use href="#i-mic"/></svg></button><button id="sendButton" class="send-button" type="button" aria-label="發送訊息"><svg><use href="#i-send"/></svg></button></div><p id="voiceStatus" class="voice-status" role="status" aria-live="polite"></p><select id="speechLang" class="sr-only" aria-label="語音語言"><option value="zh-HK">廣東話</option><option value="zh-CN">普通話</option><option value="zh-TW">國語</option></select><div class="quick-actions"><button type="button" data-quick="view"><svg><use href="#i-calendar"/></svg>查看行程</button><button type="button" data-quick="optimize"><svg><use href="#i-refresh"/></svg>重新優化</button><button type="button" data-quick="compare"><svg><use href="#i-list"/></svg>貴賓室對比</button><button type="button" data-quick="recommend"><svg><use href="#i-spark"/></svg>智能推薦</button><button type="button" data-quick="incident"><svg><use href="#i-alert"/></svg>突發修改</button></div></div>
+    <div class="composer"><div class="composer-row"><input id="requestInput" aria-label="輸入訊息" placeholder="想如何安排接下來的時間？"><button id="micButton" class="mic-button" type="button" aria-label="開始語音輸入"><svg><use href="#i-mic"/></svg></button><button id="sendButton" class="send-button" type="button" aria-label="發送訊息"><svg><use href="#i-send"/></svg></button></div><p id="voiceStatus" class="voice-status" role="status" aria-live="polite"></p><select id="speechLang" class="sr-only" aria-label="語音語言"><option value="zh-HK">廣東話</option><option value="zh-CN">普通話</option><option value="zh-TW">國語</option></select><div class="quick-actions"><button type="button" data-quick="optimize"><svg><use href="#i-refresh"/></svg>重新優化</button><button type="button" data-quick="compare"><svg><use href="#i-list"/></svg>貴賓室對比</button><button type="button" data-quick="recommend"><svg><use href="#i-spark"/></svg>智能推薦</button></div></div>
+    <nav class="app-tabbar" aria-label="主要導航"><button type="button" data-quick="view"><svg><use href="#i-list"/></svg><span>我的行程</span></button><button type="button" data-open-agent aria-current="page"><svg><use href="#i-spark"/></svg><span>智能助手</span></button><button type="button" data-quick="incident"><svg><use href="#i-alert"/></svg><span>突發修改</span></button></nav>
   </section>
 </main>
 <dialog id="sheet" class="sheet"><div class="sheet-head"><div><small id="sheetEyebrow">行程管理</small><h2 id="sheetTitle"></h2></div><button id="closeSheet" type="button" aria-label="關閉"><svg><use href="#i-close"/></svg></button></div><div id="sheetBody"></div></dialog>

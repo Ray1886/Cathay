@@ -23,9 +23,12 @@ const FILES = {
   '/reservation-model.js': ['reservation-model.js', 'text/javascript; charset=utf-8'],
   '/reservation-ui.js': ['reservation-ui.js', 'text/javascript; charset=utf-8'],
   '/styles.css': ['styles.css', 'text/css; charset=utf-8'],
-  '/assets/fonts/lounge-sans-tc.woff2': ['assets/fonts/lounge-sans-tc.woff2', 'font/woff2'],
-  '/assets/lounge-hero.png': ['assets/lounge-hero.png', 'image/png'],
-  '/assets/lounge-scenes.png': ['assets/lounge-scenes.png', 'image/png']
+  '/assets/lounges/pier-first-shower.jpg': ['assets/lounges/pier-first-shower.jpg', 'image/jpeg'],
+  '/assets/lounges/wing-first-dining.jpg': ['assets/lounges/wing-first-dining.jpg', 'image/jpeg'],
+  '/assets/lounges/pier-first-massage.jpg': ['assets/lounges/pier-first-massage.jpg', 'image/jpeg'],
+  '/assets/lounges/pier-first-rest.jpg': ['assets/lounges/pier-first-rest.jpg', 'image/jpeg'],
+  '/assets/lounges/pier-first-work.jpg': ['assets/lounges/pier-first-work.jpg', 'image/jpeg'],
+  '/assets/fonts/lounge-sans-tc.woff2': ['assets/fonts/lounge-sans-tc.woff2', 'font/woff2']
 };
 const INSTRUCTIONS = [
   '你是高端航空貴賓室的智能行程助理，以自然、簡潔的繁體中文回答。',

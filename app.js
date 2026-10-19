@@ -9,6 +9,14 @@ const TYPES = {
   work: {...ENGINE.SERVICES.work,icon:'rest',slots:['17:00','18:00']},
   gate: {...ENGINE.SERVICES.gate,icon:'walk',slots:['19:00']}
 };
+// Official lounge photographs are presentation assets, independent of booking rules.
+const SERVICE_PHOTOS = {
+  shower: {file:'pier-first-shower.jpg',alt:'國泰玉衡堂頭等貴賓室淋浴間實景'},
+  dining: {file:'wing-first-dining.jpg',alt:'國泰寰宇堂頭等貴賓室餐廳實景'},
+  massage: {file:'pier-first-massage.jpg',alt:'國泰玉衡堂頭等貴賓室按摩服務實景'},
+  rest: {file:'pier-first-rest.jpg',alt:'國泰玉衡堂頭等貴賓室日間套房實景'},
+  work: {file:'pier-first-work.jpg',alt:'國泰玉衡堂頭等貴賓室工作空間實景'}
+};
 const DEFAULT = [
   { id: 1, type: 'shower', start: '17:30', end: '18:00', ...ENGINE.resolveServiceLocation('shower','wing'), status: 'confirmed' },
   { id: 2, type: 'dining', start: '18:05', end: '18:35', ...ENGINE.resolveServiceLocation('dining','wing'), status: 'added' },
@@ -203,7 +211,7 @@ function renderServices(){
     const confirmed=selected?.status==='confirmed'&&Boolean(selected.reservationId), pending=Boolean(selected?.waitlistEntryId)&&['waiting','offered'].includes(selected.bookingState);
     const label=confirmed?'已預約':pending?selected.bookingState==='offered'?'待接受邀請':'候補中':data.reservationRequired?'需預約':'可直接添加';
     const displayedSlots=data.reservationRequired?(bookingUI?.get().slots||[]).filter(s=>s.service_code===type&&s.service_date===globalThis.ReservationModel?.tripDate(currentContext())).map(s=>s.start_time):data.slots.filter(time=>minutes(time)>=minutes(arrivalTime));
-    return '<article class="service-card"><div class="service-photo '+esc(type)+'" aria-hidden="true"></div><div class="service-body"><div class="service-name">'+esc(data.label)+'</div><span class="service-tag '+(pending?'wait':'')+'">'+label+'</span><p>'+esc(data.locations.map(id=>ENGINE.LOCATIONS[id].shortName).join('、'))+'可選</p><div class="time-options">'+(displayedSlots.length?[...new Set(displayedSlots)].map(t=>'<span>'+t+'</span>').join(''):data.reservationRequired?'<span>查看可選時段</span>':'<span>可自訂時間</span>')+'</div><button type="button" data-service="'+type+'">'+(confirmed?'管理預約':pending?'查看候補':data.reservationRequired?'選擇時段':'添加至行程')+icon('chevron')+'</button></div></article>';
+    return '<article class="service-card"><img class="service-photo '+esc(type)+'" src="./assets/lounges/'+SERVICE_PHOTOS[type].file+'" alt="'+SERVICE_PHOTOS[type].alt+'" width="450" height="300" loading="lazy" decoding="async"><div class="service-body"><div class="service-name">'+esc(data.label)+'</div><span class="service-tag '+(pending?'wait':'')+'">'+label+'</span><p>'+esc(data.locations.map(id=>ENGINE.LOCATIONS[id].shortName).join('、'))+'可選</p><div class="time-options">'+(displayedSlots.length?[...new Set(displayedSlots)].map(t=>'<span>'+t+'</span>').join(''):data.reservationRequired?'<span>查看可選時段</span>':'<span>可自訂時間</span>')+'</div><button type="button" data-service="'+type+'">'+(confirmed?'管理預約':pending?'查看候補':data.reservationRequired?'選擇時段':'添加至行程')+icon('chevron')+'</button></div></article>';
   }).join('');
 }
 function renderChat(){
@@ -562,6 +570,7 @@ function startVoice(){
 }
 if(typeof document!=='undefined'){
   $('#openAgent').addEventListener('click',()=>showScreen('agent'));
+  document.querySelectorAll('[data-open-agent]').forEach(button=>button.addEventListener('click',()=>showScreen('agent')));
   $('[data-action="back"]').addEventListener('click',()=>toast('目前已在行程首頁。'));
   $('#backToPlanner').addEventListener('click',()=>showScreen('planner'));
   $('#planPreview').addEventListener('click',()=>showScreen('planner'));
