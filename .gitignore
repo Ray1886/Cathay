@@ -22,3 +22,6 @@ coverage/
 
 # Generated GitHub Pages bundle
 _site/
+
+# Generated visual review captures
+.impeccable/review/
